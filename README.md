@@ -1,6 +1,8 @@
 # Jocys.com Focus Logger
 
-Find out which process or program is taking the window focus. In-game controls could temporary stop responding if other program steals the focus.
+Find out which process or program is taking the window focus.
+
+In game, mouse and keyborad could start temporary stop responding if other program takes the focus. This tools could help to find out which program steals the focus.
 
 # Download
 
