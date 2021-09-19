@@ -1,0 +1,37 @@
+<svg version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+    <title>windows icon</title>
+    <desc>windows icon from the IconExperience.com G-Collection. Copyright by INCORS GmbH (www.incors.com).</desc>
+    <defs>
+        <linearGradient x1="64" y1="32" x2="321.261" y2="274.12695" gradientUnits="userSpaceOnUse" id="color-1">
+            <stop offset="0" stop-color="#aab8c5"/>
+            <stop offset="1" stop-color="#91a0af"/>
+        </linearGradient>
+        <linearGradient x1="64" y1="96" x2="271.212" y2="399.9995" gradientUnits="userSpaceOnUse" id="color-2">
+            <stop offset="0" stop-color="#e6ebf0"/>
+            <stop offset="1" stop-color="#dde4eb"/>
+        </linearGradient>
+        <linearGradient x1="64" y1="144" x2="238.4955" y2="400.001" gradientUnits="userSpaceOnUse" id="color-3">
+            <stop offset="0" stop-color="#d2dae1"/>
+            <stop offset="1" stop-color="#c3ced8"/>
+        </linearGradient>
+        <linearGradient x1="0" y1="112" x2="257.2615" y2="354.127" gradientUnits="userSpaceOnUse" id="color-4">
+            <stop offset="0" stop-color="#3eb0f1"/>
+            <stop offset="1" stop-color="#129eee"/>
+        </linearGradient>
+        <linearGradient x1="0" y1="176" x2="139.215" y2="479.9995" gradientUnits="userSpaceOnUse" id="color-5">
+            <stop offset="0" stop-color="#e0f2fd"/>
+            <stop offset="1" stop-color="#cbeafb"/>
+        </linearGradient>
+    </defs>
+    <g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal">
+        <path d="M512,48l0,352l-448,0l0,-352c0,-9 7,-16 16,-16l416,0c9,0 16,7 16,16z" id="curve6" fill="url(#color-1)"/>
+        <path d="M64,96l448,0l0,304l-448,0z" id="curve5" fill="url(#color-2)"/>
+        <path d="M464,400l-400,0l0,-256l384,0c9,0 16,7 16,16z" id="curve4" fill="url(#color-3)"/>
+        <path d="M464,48c9,0 16,7 16,16c0,9 -7,16 -16,16c-9,0 -16,-7 -16,-16c0,-9 7,-16 16,-16z M416,48c9,0 16,7 16,16c0,9 -7,16 -16,16c-9,0 -16,-7 -16,-16c0,-9 7,-16 16,-16z" id="curve3" fill="#ffffff"/>
+        <path d="M448,128l0,352l-448,0l0,-352c0,-9 7,-16 16,-16l416,0c9,0 16,7 16,16z" id="curve2" fill="url(#color-4)"/>
+        <path d="M0,176l448,0l0,304l-448,0z" id="curve1" fill="url(#color-5)"/>
+        <path d="M400,128c9,0 16,7 16,16c0,9 -7,16 -16,16c-9,0 -16,-7 -16,-16c0,-9 7,-16 16,-16z M352,128c9,0 16,7 16,16c0,9 -7,16 -16,16c-9,0 -16,-7 -16,-16c0,-9 7,-16 16,-16z" id="curve0" fill="#ffffff"/>
+    </g>
+</svg>
