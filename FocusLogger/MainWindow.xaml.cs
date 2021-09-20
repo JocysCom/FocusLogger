@@ -29,7 +29,6 @@ namespace JocysCom.FocusLogger
 		{
 			ControlsHelper.InitInvokeContext();
 			InitializeComponent();
-			HMan = new BaseWithHeaderManager<int>(HelpHeadLabel, HelpBodyLabel, LeftIcon, RightIcon, this);
 			LoadHelpAndInfo();
 		}
 
@@ -38,12 +37,6 @@ namespace JocysCom.FocusLogger
 			var assembly = Assembly.GetExecutingAssembly();
 			var ai = new ClassLibrary.Configuration.AssemblyInfo();
 			Title = ai.GetTitle(true, false, true, false, false);
-			// Set Help Head text
-			var product = ((AssemblyProductAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyProductAttribute))).Product;
-			HMan.SetHead(product);
-			// Set Help Body text.
-			var description = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
-			HMan.SetBodyInfo(description);
 		}
 
 		public BaseWithHeaderManager<int> HMan;
