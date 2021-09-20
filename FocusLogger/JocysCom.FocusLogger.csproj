@@ -22,10 +22,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="PowerShell.exe -Command &quot;New-Item -ItemType Directory -Force -Path \&quot;$(ProjectDir)Resources\&quot; | Out-Null&quot;&#xD;&#xA;PowerShell.exe -Command &quot;(Get-Date).ToString(\&quot;o\&quot;) | Out-File \&quot;$(ProjectDir)Resources\BuildDate.txt\&quot;&quot;" />
-  </Target>
-
   <ItemGroup>
     <None Remove="App.ico" />
     <None Remove="Resources\BuildDate.txt" />
@@ -38,5 +34,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\BuildDate.txt" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="PowerShell.exe -Command &quot;New-Item -ItemType Directory -Force -Path \&quot;$(ProjectDir)Resources\&quot; | Out-Null&quot;&#xD;&#xA;PowerShell.exe -Command &quot;(Get-Date).ToString(\&quot;o\&quot;) | Out-File \&quot;$(ProjectDir)Resources\BuildDate.txt\&quot;&quot;" />
+  </Target>
 
 </Project>
