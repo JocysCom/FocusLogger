@@ -39,7 +39,7 @@ namespace JocysCom.FocusLogger
 			Title = ai.GetTitle(true, false, true, false, false);
 		}
 
-		public BaseWithHeaderManager<int> HMan;
+		public InfoControl HMan;
 
 		public static bool IsClosing;
 

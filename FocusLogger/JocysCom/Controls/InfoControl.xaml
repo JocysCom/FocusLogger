@@ -26,13 +26,14 @@
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 			<Label
-				Name="HelpHeadLabel"
+				Name="HeadLabel"
 				Grid.Row="0"
 				Grid.Column="0"
 				Grid.ColumnSpan="2"
 				Margin="8,3,3,3"
 				Padding="0"
-				Content="[HelpHeadLabel]"
+				x:FieldModifier="public"
+				Content="[HeadLabel]"
 				FontWeight="Bold" />
 			<ContentControl
 				Name="LeftIcon"
@@ -45,13 +46,14 @@
 				Content="{StaticResource Icon_Information}"
 				Style="{StaticResource ButtonContentControl}" />
 			<TextBlock
-				Name="HelpBodyLabel"
+				Name="BodyLabel"
 				Grid.Row="1"
 				Grid.Column="1"
 				Margin="3,0,3,3"
 				Padding="0"
 				VerticalAlignment="Top"
-				Text="[HelpBodyLabel]"
+				x:FieldModifier="public"
+				Text="[BodyLabel]"
 				TextWrapping="Wrap" />
 			<ContentControl
 				Name="RightIcon"
