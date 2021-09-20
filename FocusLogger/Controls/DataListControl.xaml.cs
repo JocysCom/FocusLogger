@@ -1,15 +1,11 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
-using JocysCom.ClassLibrary.Controls.Themes;
 using System;
-using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
 
 namespace JocysCom.FocusLogger.Controls
@@ -34,6 +30,18 @@ namespace JocysCom.FocusLogger.Controls
 			gridFormattingConverter.ConvertFunction = _MainDataGridFormattingConverter_Convert;
 		}
 
+		internal class NativeMethods
+		{
+
+			[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+			internal static extern IntPtr GetForegroundWindow();
+
+			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+			internal static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+
+
+		}
+
 		object _MainDataGridFormattingConverter_Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
 			var sender = (FrameworkElement)values[0];
@@ -54,7 +62,6 @@ namespace JocysCom.FocusLogger.Controls
 			if (ControlsHelper.IsDesignMode(this))
 				return;
 			InitTimer();
-			//Automation.AddAutomationFocusChangedEventHandler(OnFocusChangedHandler);
 		}
 
 		private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -66,7 +73,6 @@ namespace JocysCom.FocusLogger.Controls
 		{
 			if (ControlsHelper.IsDesignMode(this))
 				return;
-			//Automation.RemoveAutomationFocusChangedEventHandler(OnFocusChangedHandler);
 		}
 
 		object AddLock = new object();
@@ -81,20 +87,6 @@ namespace JocysCom.FocusLogger.Controls
 		}
 
 		int lastProcessId;
-
-		private void OnFocusChangedHandler(object src, AutomationFocusChangedEventArgs args)
-		{
-			if (MainWindow.IsClosing)
-				return;
-			var element = src as AutomationElement;
-			if (element != null)
-			{
-				var name = element.Current.Name;
-				var id = element.Current.AutomationId;
-				var processId = element.Current.ProcessId;
-				AddProcess(processId);
-			}
-		}
 
 		public void AddProcess(int processId)
 		{
@@ -152,20 +144,41 @@ namespace JocysCom.FocusLogger.Controls
 
 		public static int GetActiveProcessId()
 		{
-			var activatedHandle = GetForegroundWindow();
+			var activatedHandle = NativeMethods.GetForegroundWindow();
 			if (activatedHandle == IntPtr.Zero)
 				return 0;       // No window is currently activated
 			int activeProcId;
-			GetWindowThreadProcessId(activatedHandle, out activeProcId);
+			NativeMethods.GetWindowThreadProcessId(activatedHandle, out activeProcId);
 			return activeProcId;
 		}
 
+		/* 
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-		private static extern IntPtr GetForegroundWindow();
+		# requires .NET Core 5.0
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+		public void AutomationFocus(bool enable)
+		{
+			if (enable)
+				Automation.AddAutomationFocusChangedEventHandler(OnFocusChangedHandler);
+			else
+				Automation.RemoveAutomationFocusChangedEventHandler(OnFocusChangedHandler);
+		}
+
+		private void OnFocusChangedHandler(object src, AutomationFocusChangedEventArgs args)
+		{
+			if (MainWindow.IsClosing)
+				return;
+			var element = src as AutomationElement;
+			if (element != null)
+			{
+				var name = element.Current.Name;
+				var id = element.Current.AutomationId;
+				var processId = element.Current.ProcessId;
+				AddProcess(processId);
+			}
+		}
+
+		*/
 
 	}
 }
