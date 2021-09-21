@@ -6,6 +6,955 @@
 	x:ClassModifier="public">
 	<Viewbox
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		x:Key="Icon_keyboard"
+		x:Shared="False"
+		Stretch="Uniform">
+		<Canvas Width="512" Height="512">
+			<Canvas.RenderTransform>
+				<TranslateTransform X="0" Y="0" />
+			</Canvas.RenderTransform>
+			<Canvas.Resources>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-1" MappingMode="Absolute" StartPoint="64,0" EndPoint="64,224">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#8F9EAD" />
+							<GradientStop Offset="1" Color="#717F8F" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-2" MappingMode="Absolute" StartPoint="0,208" EndPoint="380,448">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#48B4F2" />
+							<GradientStop Offset="1" Color="#23A5EF" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-3" MappingMode="Absolute" StartPoint="32,240" EndPoint="39,264">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#CFEBFC" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-4" MappingMode="Absolute" StartPoint="96,240" EndPoint="107,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-5" MappingMode="Absolute" StartPoint="144,240" EndPoint="155,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-6" MappingMode="Absolute" StartPoint="192,240" EndPoint="203,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-7" MappingMode="Absolute" StartPoint="240,240" EndPoint="251,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-8" MappingMode="Absolute" StartPoint="288,240" EndPoint="299,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-9" MappingMode="Absolute" StartPoint="336,240" EndPoint="347,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-10" MappingMode="Absolute" StartPoint="384,240" EndPoint="395,262">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-11" MappingMode="Absolute" StartPoint="432,240" EndPoint="439,264">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#CFEBFC" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-12" MappingMode="Absolute" StartPoint="32,288" EndPoint="35,320">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FCFEFF" />
+							<GradientStop Offset="1" Color="#DAF0FD" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-13" MappingMode="Absolute" StartPoint="126,288" EndPoint="137,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-14" MappingMode="Absolute" StartPoint="174,288" EndPoint="185,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-15" MappingMode="Absolute" StartPoint="222,288" EndPoint="233,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-16" MappingMode="Absolute" StartPoint="270,288" EndPoint="281,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-17" MappingMode="Absolute" StartPoint="318,288" EndPoint="329,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-18" MappingMode="Absolute" StartPoint="366,288" EndPoint="377,310">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-19" MappingMode="Absolute" StartPoint="414,288" EndPoint="450,362">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#CFEBFC" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-20" MappingMode="Absolute" StartPoint="144,336" EndPoint="155,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-21" MappingMode="Absolute" StartPoint="32,336" EndPoint="43,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#D4EDFC" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-22" MappingMode="Absolute" StartPoint="192,336" EndPoint="203,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-23" MappingMode="Absolute" StartPoint="240,336" EndPoint="251,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-24" MappingMode="Absolute" StartPoint="288,336" EndPoint="299,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-25" MappingMode="Absolute" StartPoint="336,336" EndPoint="347,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-26" MappingMode="Absolute" StartPoint="384,336" EndPoint="395,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-27" MappingMode="Absolute" StartPoint="32,384" EndPoint="35,416">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FCFEFF" />
+							<GradientStop Offset="1" Color="#D8EFFC" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-28" MappingMode="Absolute" StartPoint="112,384" EndPoint="123,406">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-29" MappingMode="Absolute" StartPoint="160,384" EndPoint="164,416">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FBFDFF" />
+							<GradientStop Offset="1" Color="#DEF1FD" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-30" MappingMode="Absolute" StartPoint="352,384" EndPoint="363,406">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-31" MappingMode="Absolute" StartPoint="400,384" EndPoint="403,416">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FCFEFF" />
+							<GradientStop Offset="1" Color="#DAF0FD" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-32" MappingMode="Absolute" StartPoint="96,336" EndPoint="107,358">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C9E9FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+			</Canvas.Resources>
+			<!--  Unknown tag: metadata  -->
+			<!--  Unknown tag: sodipodi:namedview  -->
+			<Canvas>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-1}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M64 224l0 -32c0 -53 43 -96 96 -96l80 0c35.5 0 64 -28.5 64 -64l0 -32l32 0l0 32c0 53 -43 96 -96 96l-80 0c-35.5 0 -64 28.5 -64 64l0 32z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-2}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M16 208l480 0c9 0 16 7 16 16l0 208c0 9 -7 16 -16 16l-480 0c-9 0 -16 -7 -16 -16l0 -208c0 -9 7 -16 16 -16z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-3}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M40 240l32 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-32 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-4}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M104 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-5}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M152 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-6}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M200 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-7}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M248 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-8}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M296 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-9}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M344 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-10}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M392 240l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-11}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M440 240l32 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-32 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-12}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M40 288l40 0l21.5 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-61.5 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-13}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M133.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-14}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M181.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-15}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M229.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-16}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M277.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-17}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M325.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-18}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M373.5 288l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-19}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M421.5 288l50.5 0c4.5 0 8 3.5 8 8l0 64c0 4.5 -3.5 8 -8 8l-32 0c-4.5 0 -8 -3.5 -8 -8l0 -32c0 -4.5 -3.5 -8 -8 -8l-2.5 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-20}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M152 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-21}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M40 336l8 0l24 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-32 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-22}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M200 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-23}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M248 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-24}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M296 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-25}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M344 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-26}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M392 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-27}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M40 384l48 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-48 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-28}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M120 384l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-29}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M168 384l160 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-160 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-30}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M360 384l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-31}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M408 384l64 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-64 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-32}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M104 336l16 0c4.5 0 8 3.5 8 8l0 16c0 4.5 -3.5 8 -8 8l-16 0c-4.5 0 -8 -3.5 -8 -8l0 -16c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+			</Canvas>
+		</Canvas>
+	</Viewbox>
+	<Viewbox
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		x:Key="Icon_mouse2"
+		x:Shared="False"
+		Stretch="Uniform">
+		<Canvas Width="512" Height="512">
+			<Canvas.RenderTransform>
+				<TranslateTransform X="0" Y="0" />
+			</Canvas.RenderTransform>
+			<Canvas.Resources>
+				<RadialGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-1" Center="126,246" GradientOrigin="126,246" MappingMode="Absolute" RadiusX="418.24558" RadiusY="418.24558">
+					<RadialGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#B3C0CD" />
+							<GradientStop Offset="0.43137" Color="#9AA8B6" />
+							<GradientStop Offset="1" Color="#717F8F" />
+						</GradientStopCollection>
+					</RadialGradientBrush.GradientStops>
+				</RadialGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-2" MappingMode="Absolute" StartPoint="80,16" EndPoint="464,448">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C5E7FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-3" MappingMode="Absolute" StartPoint="272,16" EndPoint="656,448">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="1" Color="#C5E7FB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-4" MappingMode="Absolute" StartPoint="224,48" EndPoint="320,48">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#FFFFFF" />
+							<GradientStop Offset="0.50196" Color="#D8E0E8" />
+							<GradientStop Offset="1" Color="#91A0AF" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+			</Canvas.Resources>
+			<!--  Unknown tag: metadata  -->
+			<!--  Unknown tag: sodipodi:namedview  -->
+			<Canvas>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-1}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M448 96l0 224c0 106 -86 192 -192 192c-106 0 -192 -86 -192 -192l0 -224c0 -53 43 -96 96 -96c64 0 128 0 192 0c53 0 96 43 96 96z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-2}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M208 272l32 0l0 -256l-80 0c-44 0 -80 36 -80 80l0 48c0 70.5 57.5 128 128 128z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-3}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M272 272l32 0c70.5 0 128 -57.5 128 -128l0 -48c0 -44 -36 -80 -80 -80l-80 0z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="#FF91A0AF"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M256 32c26.5 0 48 21.5 48 48l0 48c0 26.5 -21.5 48 -48 48c-26.5 0 -48 -21.5 -48 -48l0 -48c0 -26.5 21.5 -48 48 -48z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-4}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M256 48c17.5 0 32 14.5 32 32l0 48c0 17.5 -14.5 32 -32 32c-17.5 0 -32 -14.5 -32 -32l0 -48c0 -17.5 14.5 -32 32 -32z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+			</Canvas>
+		</Canvas>
+	</Viewbox>
+	<Viewbox
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		x:Key="Icon_text_field"
+		x:Shared="False"
+		Stretch="Uniform">
+		<Canvas Width="512" Height="512">
+			<Canvas.RenderTransform>
+				<TranslateTransform X="0" Y="0" />
+			</Canvas.RenderTransform>
+			<Canvas.Resources>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-1" MappingMode="Absolute" StartPoint="0,176" EndPoint="103,336">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#F4F6F8" />
+							<GradientStop Offset="1" Color="#E7ECF1" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-2" MappingMode="Absolute" StartPoint="32,208" EndPoint="113,298">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#129EEE" />
+							<GradientStop Offset="1" Color="#1086CA" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+			</Canvas.Resources>
+			<!--  Unknown tag: metadata  -->
+			<!--  Unknown tag: sodipodi:namedview  -->
+			<Canvas>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-1}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M8 176l496 0c4.5 0 8 3.5 8 8l0 144c0 4.5 -3.5 8 -8 8l-496 0c-4.5 0 -8 -3.5 -8 -8l0 -144c0 -4.5 3.5 -8 8 -8z" FillRule="EvenOdd" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-2}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M92.5 285l-31 0l-5.5 17.5l-24 0l34.5 -93l21 0l34.5 93l-24.5 0z M67 268l20 0l-10 -32.5z M133.5 302.5l0 -93l33.5 0c12 0 21 2 27.5 6.5c6 4.5 9 10.5 9 19c0 5 -1 9 -3 12.5c-2.5 3.5 -5.5 6 -10 7.5c5 1.5 8.5 4 11 7.5c3 3.5 4 7.5 4 12.5c0 9 -2.5 16 -8.5 20.5c-6 5 -14.5 7 -26 7z M156 263l0 22.5l14.5 0c4 0 7.5 -1 9.5 -3c2 -2 3 -4.5 3 -7.5c0 -8 -3.5 -12 -11.5 -12z M156 248l11.5 0c5 0 8.5 -1 10.5 -2.5c2 -2 3 -4.5 3 -8c0 -3.5 -1 -6.5 -3 -8c-2.5 -2 -6 -3 -11 -3l-11 0z M298 271c0 6.5 -2 12.5 -5 17.5c-3.5 5 -8 8.5 -13.5 11.5c-6 2.5 -12.5 4 -20 4c-12 0 -22 -4 -29 -12c-7 -8 -10.5 -19.5 -10.5 -34l0 -4.5c0 -9 1.5 -17 5 -24c3 -7 7.5 -12 13.5 -16c6 -3.5 13 -5.5 21 -5.5c11 0 20 3 27 9c7 6 11 14 12 24.5l-22.5 0c-0.5 -5.5 -1.5 -9.5 -4.5 -12c-2.5 -2.5 -6.5 -4 -12 -4c-6 0 -10 2 -12.5 6.5c-2.5 4 -4 11 -4 20l0 6.5c0 10 1 17 3.5 21.5c2.5 4.5 7 6.5 13 6.5c5 0 9 -1.5 12 -4c2.5 -2 4 -6 4.5 -11.5z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="#FF717F8F"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M304 144l32 0c3 0 5.5 1 8 2c2.5 -1 5 -2 8 -2l32 0l0 16l-32 0l0 192l32 0l0 16l-32 0c-3 0 -5.5 -1 -8 -2c-2.5 1 -5 2 -8 2l-32 0l0 -16l32 0l0 -192l-32 0z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+			</Canvas>
+		</Canvas>
+	</Viewbox>
+	<Viewbox
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		x:Key="Icon_window"
+		x:Shared="False"
+		Stretch="Uniform">
+		<Canvas Width="512" Height="512">
+			<Canvas.RenderTransform>
+				<TranslateTransform X="0" Y="0" />
+			</Canvas.RenderTransform>
+			<Canvas.Resources>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-1" MappingMode="Absolute" StartPoint="0,64" EndPoint="284,331">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#40B0F1" />
+							<GradientStop Offset="1" Color="#129EEE" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+				<LinearGradientBrush xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Key="color-2" MappingMode="Absolute" StartPoint="0,128" EndPoint="154,464">
+					<LinearGradientBrush.GradientStops>
+						<GradientStopCollection>
+							<GradientStop Offset="0" Color="#E1F2FD" />
+							<GradientStop Offset="1" Color="#CCEAFB" />
+						</GradientStopCollection>
+					</LinearGradientBrush.GradientStops>
+				</LinearGradientBrush>
+			</Canvas.Resources>
+			<!--  Unknown tag: metadata  -->
+			<!--  Unknown tag: sodipodi:namedview  -->
+			<Canvas>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-1}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M512 80l0 384l-512 0l0 -384c0 -9 7 -16 16 -16l480 0c9 0 16 7 16 16z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="{StaticResource color-2}"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M0 128l512 0l0 336l-512 0z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+				<Path
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					Fill="#FFFFFFFF"
+					StrokeDashArray=""
+					StrokeEndLineCap="Flat"
+					StrokeLineJoin="Miter"
+					StrokeMiterLimit="10"
+					StrokeStartLineCap="Flat"
+					StrokeThickness="1">
+					<Path.Data>
+						<PathGeometry Figures="M464 80c9 0 16 7 16 16c0 9 -7 16 -16 16c-9 0 -16 -7 -16 -16c0 -9 7 -16 16 -16z M416 80c9 0 16 7 16 16c0 9 -7 16 -16 16c-9 0 -16 -7 -16 -16c0 -9 7 -16 16 -16z" FillRule="NonZero" />
+					</Path.Data>
+				</Path>
+			</Canvas>
+		</Canvas>
+	</Viewbox>
+	<Viewbox
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		x:Key="Icon_windows"
 		x:Shared="False"
 		Stretch="Uniform">

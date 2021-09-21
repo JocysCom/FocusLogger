@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,10 +19,6 @@ namespace JocysCom.FocusLogger.Controls
 			InitializeComponent();
 			if (ControlsHelper.IsDesignMode(this))
 				return;
-			if (!IsElevated)
-			{
-				WindowTiteColumn.Visibility = Visibility.Hidden;
-			}
 			// Configure converter.
 			MainDataGrid.ItemsSource = DataItems;
 			var gridFormattingConverter = MainDataGrid.Resources.Values.OfType<ItemFormattingConverter>().First();
@@ -37,9 +32,36 @@ namespace JocysCom.FocusLogger.Controls
 			var cell = (DataGridCell)(template ?? sender).Parent;
 			var value = values[2];
 			var item = (DataItem)cell.DataContext;
-			if (cell.Column == ProcessPathColumn)
+			if (cell.Column == IsActiveImageColumn)
 			{
+				return item.IsActive ? Icons_Default.Current[Icons_Default.Icon_window] : null;
 			}
+			if (cell.Column == IsActiveColumn)
+			{
+				cell.Opacity = 0.5;
+				return item.IsActive ? "Active" : "";
+			}
+			// Mouse.
+			if (cell.Column == HasMouseColumn)
+				return item.HasMouse ? "Mouse" : "";
+			if (cell.Column == HasMouseImageColumn)
+				return item.HasMouse ? Icons_Default.Current[Icons_Default.Icon_mouse2] : null;
+			// Keyboard.
+			if (cell.Column == HasKeyboardImageColumn)
+				return item.HasKeyboard ? Icons_Default.Current[Icons_Default.Icon_keyboard] : null;
+			if (cell.Column == HasKeyboardColumn)
+				return item.HasKeyboard ? "Keyboard" : "";
+			// Caret.
+			if (cell.Column == HasCaretImageColumn)
+				return item.HasCaret ? Icons_Default.Current[Icons_Default.Icon_text_field] : null;
+			if (cell.Column == HasCaretColumn)
+				return item.HasCaret ? "Caret" : "";
+			if (cell.Column == DateColumn)
+			{
+				value = string.Format("{0:HH:mm:ss:fff}", item.Date);
+				cell.Opacity = 0.5;
+			}
+			// Other.
 			return value;
 		}
 
@@ -74,39 +96,15 @@ namespace JocysCom.FocusLogger.Controls
 			}
 		}
 
-		int lastProcessId;
-
-		public void AddProcess(int processId)
+		public void UpdateFromProcess(DataItem item)
 		{
-			lock (AddLock)
+			using (var process = Process.GetProcessById(item.ProcessId))
 			{
-				// Add only if process changed.
-				if (lastProcessId == processId)
-					return;
-				lastProcessId = processId;
-			}
-			using (var process = Process.GetProcessById(processId))
-			{
-				var item = new DataItem();
-				item.Date = DateTime.Now;
-				item.ProcessId = process.Id;
 				item.ProcessName = process.ProcessName;
-				if (processId > 0)
+				if (item.ProcessId > 0)
 				{
 					item.ProcessPath = process.MainModule?.FileName;
-					if (IsElevated)
-					{
-						try
-						{
-							item.WindowTitle = process.MainWindowTitle;
-						}
-						catch { }
-					}
 				}
-				ControlsHelper.BeginInvoke(() =>
-				{
-					DataItems.Insert(0, item);
-				});
 			}
 		}
 
@@ -126,47 +124,66 @@ namespace JocysCom.FocusLogger.Controls
 			if (MainWindow.IsClosing)
 				return;
 			_Timer.Start();
-			var processId = GetActiveProcessId();
-			AddProcess(processId);
+			UpdateInfo();
 		}
 
-		public static int GetActiveProcessId()
+		DataItem oldActiveItem = new DataItem();
+		DataItem oldForegroundItem = new DataItem();
+
+		public void UpdateInfo()
 		{
-			var activatedHandle = NativeMethods.GetForegroundWindow();
-			if (activatedHandle == IntPtr.Zero)
-				return 0;       // No window is currently activated
-			int activeProcId;
-			NativeMethods.GetWindowThreadProcessId(activatedHandle, out activeProcId);
-			return activeProcId;
-		}
-
-		/* 
-
-		# requires .NET Core 5.0
-
-		public void AutomationFocus(bool enable)
-		{
-			if (enable)
-				Automation.AddAutomationFocusChangedEventHandler(OnFocusChangedHandler);
-			else
-				Automation.RemoveAutomationFocusChangedEventHandler(OnFocusChangedHandler);
-		}
-
-		private void OnFocusChangedHandler(object src, AutomationFocusChangedEventArgs args)
-		{
-			if (MainWindow.IsClosing)
-				return;
-			var element = src as AutomationElement;
-			if (element != null)
+			// Active window -  Window that appears in the foreground with a highlighted title bar.
+			// Foreground window - Window with which the user is currently working.
+			//   The system assigns a slightly higher priority to the thread used to create the foreground window.
+			// Focus window - Window that is currently receiving keyboard input.
+			//   The focus window is always the active window, a descendent of the active window, or NULL.
+			// Top-Level window -  A window that has no parent window.
+			//
+			lock (AddLock)
 			{
-				var name = element.Current.Name;
-				var id = element.Current.AutomationId;
-				var processId = element.Current.ProcessId;
-				AddProcess(processId);
+				// Get window which or child window of which receives keyboard input.
+				var activeHandle = NativeMethods.GetActiveWindow();
+				var activeItem = GetItemFromHandle(activeHandle, true);
+				if (!activeItem.IsSame(oldActiveItem))
+				{
+					oldActiveItem = activeItem;
+					UpdateFromProcess(activeItem);
+					ControlsHelper.BeginInvoke(() => DataItems.Insert(0, activeItem));
+				}
+				// Get foreground window.
+				var foregroundHandle = NativeMethods.GetForegroundWindow();
+				var foregroundItem = GetItemFromHandle(foregroundHandle);
+				if (!foregroundItem.IsSame(oldForegroundItem))
+				{
+					oldForegroundItem = foregroundItem;
+					UpdateFromProcess(foregroundItem);
+					ControlsHelper.BeginInvoke(() => DataItems.Insert(0, foregroundItem));
+				}
 			}
 		}
 
-		*/
+		DataItem GetItemFromHandle(IntPtr hWnd, bool isActive = false)
+		{
+			var item = new DataItem();
+			item.Date = DateTime.Now;
+			item.IsActive = isActive;
+			var info = NativeMethods.GetInfo(hWnd);
+			if (info.HasValue)
+			{
+				item.HasMouse = info.Value.hwndCapture != IntPtr.Zero;
+				item.HasKeyboard = info.Value.hwndFocus != IntPtr.Zero;
+				item.HasCaret = info.Value.hwndCaret != IntPtr.Zero;
+			}
+			int processId;
+			if (isActive)
+			{
+				hWnd = NativeMethods.GetTopWindow(hWnd);
+			}
+			item.WindowTitle = NativeMethods.GetWindowText(hWnd);
+			NativeMethods.GetWindowThreadProcessId(hWnd, out processId);
+			item.ProcessId = processId;
+			return item;
+		}
 
 	}
 }

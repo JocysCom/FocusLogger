@@ -35,71 +35,215 @@
 				</Button>
 			</ToolBar>
 		</ToolBarPanel>
-		<StackPanel
+		<DataGrid
+			x:Name="MainDataGrid"
 			Grid.Row="1"
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Stretch"
-			Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
-			<!--  Grid must be wrapped inside white panel in order for empty rows to have white background.  -->
-			<DataGrid
-				x:Name="MainDataGrid"
-				Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=StackPanel, AncestorLevel=1}}"
-				Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=StackPanel, AncestorLevel=1}}"
-				HorizontalAlignment="Stretch"
-				VerticalAlignment="Stretch"
-				x:FieldModifier="public"
-				AutoGenerateColumns="False"
-				Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
-				BorderThickness="0"
-				IsReadOnly="True"
-				ScrollViewer.CanContentScroll="True"
-				ScrollViewer.HorizontalScrollBarVisibility="Auto"
-				ScrollViewer.VerticalScrollBarVisibility="Auto"
-				SelectionMode="Extended">
-				<DataGrid.Resources>
-					<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
-				</DataGrid.Resources>
-				<DataGrid.Columns>
-					<DataGridTextColumn
-						x:Name="DateColumn"
-						Width="Auto"
-						Binding="{Binding Date, StringFormat='yyyy-MM-dd HH:mm:ss:fff', Mode=OneWay}"
-						EditingElementStyle="{StaticResource TextBoxCell}"
-						ElementStyle="{StaticResource TextBlockCell}"
-						Header="Date" />
-					<DataGridTextColumn
-						x:Name="ProcessIdColumn"
-						Binding="{Binding ProcessId}"
-						EditingElementStyle="{StaticResource TextBoxCell}"
-						ElementStyle="{StaticResource TextBlockCell}"
-						Header="PID" />
-					<DataGridTextColumn
-						x:Name="ProcessNameColumn"
-						Binding="{Binding ProcessName}"
-						EditingElementStyle="{StaticResource TextBoxCell}"
-						ElementStyle="{StaticResource TextBlockCell}"
-						Header="Name" />
-					<DataGridTextColumn
-						x:Name="WindowTiteColumn"
-						Binding="{Binding WindowTitle}"
-						EditingElementStyle="{StaticResource TextBoxCell}"
-						ElementStyle="{StaticResource TextBlockCell}"
-						Header="Window Title" />
-					<DataGridTextColumn
-						x:Name="ProcessPathColumn"
-						Width="Auto"
-						x:FieldModifier="public"
-						Binding="{Binding ProcessPath}"
-						EditingElementStyle="{StaticResource TextBoxCell}"
-						ElementStyle="{StaticResource TextBlockCell}"
-						Header="Path" />
-				</DataGrid.Columns>
-				<DataGrid.CellStyle>
-					<Style TargetType="DataGridCell">
-						<Setter Property="Padding" Value="4" />
-					</Style>
-				</DataGrid.CellStyle>
-			</DataGrid>
-		</StackPanel>
+			x:FieldModifier="public"
+			AutoGenerateColumns="False"
+			Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+			BorderThickness="0"
+			IsReadOnly="True"
+			ScrollViewer.CanContentScroll="True"
+			ScrollViewer.HorizontalScrollBarVisibility="Auto"
+			ScrollViewer.VerticalScrollBarVisibility="Auto"
+			SelectionMode="Extended">
+			<DataGrid.Resources>
+				<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
+			</DataGrid.Resources>
+			<DataGrid.Columns>
+				<DataGridTextColumn
+					x:Name="DateColumn"
+					Width="Auto"
+					EditingElementStyle="{StaticResource TextBlockCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Date">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="Date" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+				<DataGridTextColumn
+					x:Name="ProcessIdColumn"
+					Binding="{Binding ProcessId}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockRightCell}"
+					Header="PID" />
+				<DataGridTextColumn
+					x:Name="ProcessNameColumn"
+					Binding="{Binding ProcessName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Process Name" />
+				<DataGridTemplateColumn x:Name="IsActiveImageColumn" Width="SizeToCells" IsReadOnly="True">
+					<DataGridTemplateColumn.Header>
+						<TextBlock HorizontalAlignment="Center" Text="A" ToolTip="Window is Active" />
+					</DataGridTemplateColumn.Header>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentControl
+								x:Name="IsActiveIcon"
+								Width="12"
+								Height="12"
+								Style="{StaticResource ButtonContentControl}">
+								<ContentControl.Content>
+									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+										<Binding RelativeSource="{RelativeSource Self}" />
+										<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+										<Binding Path="IsActive" />
+									</MultiBinding>
+								</ContentControl.Content>
+							</ContentControl>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn
+					x:Name="IsActiveColumn"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Active"
+					Visibility="Collapsed">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="IsActive" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+				<DataGridTemplateColumn x:Name="HasMouseImageColumn" Width="SizeToCells" IsReadOnly="True">
+					<DataGridTemplateColumn.Header>
+						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Mouse" />
+					</DataGridTemplateColumn.Header>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentControl
+								x:Name="HasMouseIcon"
+								Width="12"
+								Height="12"
+								Style="{StaticResource ButtonContentControl}">
+								<ContentControl.Content>
+									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+										<Binding RelativeSource="{RelativeSource Self}" />
+										<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+										<Binding Path="HasMouse" />
+									</MultiBinding>
+								</ContentControl.Content>
+							</ContentControl>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn
+					x:Name="HasMouseColumn"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Mouse"
+					Visibility="Collapsed">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="HasMouse" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+				<DataGridTemplateColumn x:Name="HasKeyboardImageColumn" Width="SizeToCells" IsReadOnly="True">
+					<DataGridTemplateColumn.Header>
+						<TextBlock Text="K" ToolTip="Window has Keyboard" />
+					</DataGridTemplateColumn.Header>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentControl
+								x:Name="HasKeyboardIcon"
+								Width="12"
+								Height="12"
+								Style="{StaticResource ButtonContentControl}">
+								<ContentControl.Content>
+									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+										<Binding RelativeSource="{RelativeSource Self}" />
+										<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+										<Binding Path="HasKeyboard" />
+									</MultiBinding>
+								</ContentControl.Content>
+							</ContentControl>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn
+					x:Name="HasKeyboardColumn"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Keyboard"
+					Visibility="Collapsed">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="HasKeyboard" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+				<DataGridTemplateColumn x:Name="HasCaretImageColumn" Width="SizeToCells" IsReadOnly="True">
+					<DataGridTemplateColumn.Header>
+						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Caret" />
+					</DataGridTemplateColumn.Header>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentControl
+								x:Name="HasCaretIcon"
+								Width="12"
+								Height="12"
+								Style="{StaticResource ButtonContentControl}">
+								<ContentControl.Content>
+									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+										<Binding RelativeSource="{RelativeSource Self}" />
+										<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+										<Binding Path="HasCaret" />
+									</MultiBinding>
+								</ContentControl.Content>
+							</ContentControl>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<DataGridTextColumn
+					x:Name="HasCaretColumn"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Caret"
+					Visibility="Collapsed">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="HasCaret" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+				<DataGridTextColumn
+					x:Name="WindowTiteColumn"
+					Binding="{Binding WindowTitle}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Window Title" />
+				<DataGridTextColumn
+					x:Name="ProcessPathColumn"
+					Width="Auto"
+					x:FieldModifier="public"
+					Binding="{Binding ProcessPath}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Path" />
+			</DataGrid.Columns>
+			<DataGrid.CellStyle>
+				<Style TargetType="DataGridCell">
+					<Setter Property="Padding" Value="4" />
+				</Style>
+			</DataGrid.CellStyle>
+		</DataGrid>
 	</Grid>
 </UserControl>

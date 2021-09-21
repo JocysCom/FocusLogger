@@ -23,11 +23,33 @@ namespace JocysCom.FocusLogger
 		public string WindowTitle { get => _WindowTitle; set => SetProperty(ref _WindowTitle, value); }
 		string _WindowTitle;
 
+		public bool HasMouse { get => _HasMouse; set => SetProperty(ref _HasMouse, value); }
+		bool _HasMouse;
+
+		public bool HasKeyboard { get => _HasKeyboard; set => SetProperty(ref _HasKeyboard, value); }
+		bool _HasKeyboard;
+
+		public bool HasCaret { get => _HasCaret; set => SetProperty(ref _HasCaret, value); }
+		bool _HasCaret;
+
+		public bool IsActive { get => _IsActive; set => SetProperty(ref _IsActive, value); }
+		bool _IsActive;
+
+	public bool IsSame(DataItem item)
+		{
+			return
+			item.ProcessId == ProcessId &&
+			item.HasMouse == HasMouse &&
+			item.HasKeyboard == HasKeyboard &&
+			item.HasCaret == HasCaret &&
+			item.IsActive == IsActive;
+		}
+
 		public System.Windows.MessageBoxImage StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
 		System.Windows.MessageBoxImage _StatusCode;
 
 		#region ■ ISettingsItem
-		
+
 		bool ISettingsItem.Enabled { get => IsEnabled; set => IsEnabled = value; }
 		private bool IsEnabled;
 

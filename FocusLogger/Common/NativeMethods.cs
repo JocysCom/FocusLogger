@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -12,22 +11,52 @@ namespace JocysCom.FocusLogger
 		/// <summary>
 		/// Get handle to the window with the keyboard focus.
 		/// </summary>
-		/// <remarks>
-		/// If the calling thread's message queue does not have an associated window
-		/// with the keyboard focus, the return value is NULL.
-		/// </remarks>
+		/// <returns>
+		/// The return value is the handle to the window with the keyboard focus.
+		/// If the calling thread's message queue does not have an associated window with the keyboard focus, the return value is NULL.
+		/// </returns>
 		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
 		internal static extern IntPtr GetFocus();
 
 		/// <summary>
 		/// Window which is active.
 		/// </summary>
+		/// <returns>
+		/// The return value is the handle to the active window attached to the calling thread's message queue.
+		/// Otherwise, the return value is NULL.
+		/// </returns>
 		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
 		internal static extern IntPtr GetActiveWindow();
 
 		/// <summary>
+		/// Get handle to the child window at the top of the Z order.
+		/// </summary>
+		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+		internal static extern IntPtr GetTopWindow(IntPtr hWnd);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+		internal static extern bool IsWindowVisible(IntPtr hWnd);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+		internal static extern int GetWindowTextLengthW(IntPtr hWnd);
+
+		/// <summary>
+		/// Copies the text of the specified window's title bar (if it has one) into a buffer.
+		/// </summary>
+		/// <param name="hWnd">A handle to the window or control containing the text.</param>
+		/// <param name="lpString">The buffer that will receive the text.</param>
+		/// <param name="nMaxCount">The maximum number of characters to copy to the buffer, including the null character.</param>
+		/// <returns>If the function succeeds, the return value is the length, in characters, of the copied string, not including the terminating null character.</returns>
+		[DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+		/// <summary>
 		/// A handle to the window that will receive the keyboard input. 
 		/// </summary>
+		/// <returns>
+		/// The return value is a handle to the foreground window.
+		/// The foreground window can be NULL in certain circumstances, such as when a window is losing activation.
+		/// </returns>
 		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
 		internal static extern IntPtr GetForegroundWindow();
 
@@ -35,36 +64,26 @@ namespace JocysCom.FocusLogger
 		/// Retrieves the identifier of the thread that created the specified window and,
 		/// optionally, the identifier of the process that created the window.
 		/// </summary>
-		/// <param name="handle">A handle to the window.</param>
-		/// <param name="processId">A pointer to a variable that receives the process identifier</param>
-		/// <returns></returns>
+		/// <param name="hWnd">A handle to the window.</param>
+		/// <param name="lpdwProcessId">A pointer to a variable that receives the process identifier</param>
+		/// <returns>Identifier of the thread that created the window.</returns>
 		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		internal static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+		internal static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
 		/// <summary>
 		/// Retrieves information about the active window or a specified GUI thread.
 		/// </summary>
-		/// <param name="hTreadID">
+		/// <param name="idThread">
 		/// The identifier for the thread for which information is to be retrieved.
 		/// To retrieve this value, use the GetWindowThreadProcessId function.
 		/// If this parameter is NULL, the function returns information for the foreground thread.
 		/// </param>
-		/// <param name="lpgui">
+		/// <param name="pgui">
 		/// A pointer to a GUITHREADINFO structure that receives information describing the thread. 
 		/// </param>
-		/// <returns></returns>
+		/// <returns>If the function succeeds, the return value is nonzero.</returns>
 		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		internal static extern bool GetGUIThreadInfo(uint hTreadID, ref GUITHREADINFO lpgui);
-
-		/// <summary>
-		/// Retrieves the identifier of the thread that created the specified window and,
-		/// optionally, the identifier of the process that created the window.
-		/// </summary>
-		/// <param name="hwnd">A handle to the window.</param>
-		/// <param name="lpdwProcessId">A pointer to a variable that receives the process identifier.</param>
-		/// <returns></returns>
-		[DllImport("user32.dll")]
-		internal static extern uint GetWindowThreadProcessId(uint hwnd, out uint lpdwProcessId);
+		internal static extern bool GetGUIThreadInfo(int idThread, ref GUITHREADINFO pgui);
 
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct RECT
@@ -113,15 +132,24 @@ namespace JocysCom.FocusLogger
 			public RECT rectCaret;
 		}
 
-		internal static bool GetInfo(uint hwnd, out GUITHREADINFO lpgui)
+		internal static GUITHREADINFO? GetInfo(IntPtr hWnd)
 		{
-			uint lpdwProcessId;
-			uint threadId = GetWindowThreadProcessId(hwnd, out lpdwProcessId);
-			lpgui = new GUITHREADINFO();
-			lpgui.cbSize = Marshal.SizeOf(lpgui);
-			return GetGUIThreadInfo(threadId, ref lpgui);
+			int lpdwProcessId;
+			int threadId = GetWindowThreadProcessId(hWnd, out lpdwProcessId);
+			var pgui = new GUITHREADINFO();
+			pgui.cbSize = Marshal.SizeOf(pgui);
+			if (GetGUIThreadInfo(threadId, ref pgui))
+				return pgui;
+			return null;
 		}
 
+		internal static string GetWindowText(IntPtr hWnd)
+		{
+			int textLength = GetWindowTextLengthW(hWnd);
+			var lpString = new StringBuilder(textLength + 1);
+			var length = GetWindowText(hWnd, lpString, lpString.Capacity);
+			return lpString.ToString();
+		}
 
 	}
 }
