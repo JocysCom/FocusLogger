@@ -30,18 +30,6 @@ namespace JocysCom.FocusLogger.Controls
 			gridFormattingConverter.ConvertFunction = _MainDataGridFormattingConverter_Convert;
 		}
 
-		internal class NativeMethods
-		{
-
-			[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-			internal static extern IntPtr GetForegroundWindow();
-
-			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-			internal static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
-
-
-		}
-
 		object _MainDataGridFormattingConverter_Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
 			var sender = (FrameworkElement)values[0];
