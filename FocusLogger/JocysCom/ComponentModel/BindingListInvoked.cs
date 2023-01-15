@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,6 +115,23 @@ namespace JocysCom.ClassLibrary.ComponentModel
 		{
 			Invoke((Action<AddingNewEventArgs>)base.OnAddingNew, e);
 		}
+
+		//public void FixLeak()
+		//{
+		//	var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+		//	var fi = GetType().BaseType.BaseType.GetField("onListChanged", flags);
+		//	var d = (Delegate)fi.GetValue(this);
+		//	if (d != null)
+		//	{
+		//		if (d.Target is System.Windows.Data.BindingListCollectionView view)
+		//		{
+		//			view.DetachFromSourceCollection();
+		//			var vfi = view.GetType().BaseType.GetField("_currentItem", flags);
+		//			vfi.SetValue(view, null);
+		//			fi.SetValue(this, null);
+		//		}
+		//	}
+		//}
 
 		#endregion
 	}

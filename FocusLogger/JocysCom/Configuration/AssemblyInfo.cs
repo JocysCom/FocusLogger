@@ -8,7 +8,6 @@ namespace JocysCom.ClassLibrary.Configuration
 {
 	public partial class AssemblyInfo
 	{
-
 		public AssemblyInfo()
 		{
 			Assembly =
@@ -32,13 +31,6 @@ namespace JocysCom.ClassLibrary.Configuration
 					return _Entry;
 				}
 			}
-		}
-
-		public static string ExpandPath(string path)
-		{
-			path = Environment.ExpandEnvironmentVariables(path);
-			path = JocysCom.ClassLibrary.Text.Helper.Replace(path, Entry, false);
-			return path;
 		}
 
 		public AssemblyInfo(string strValFile)
@@ -131,7 +123,10 @@ namespace JocysCom.ClassLibrary.Configuration
 			get
 			{
 				if (_RunMode == null)
-					_RunMode = SettingsParser.Current.Parse("RunMode", "");
+					// TODO: Standardize configuration provider XML, JSON, INI, Registry, etc...
+					// https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration-providers
+					//_RunMode = SettingsParser.Current.Parse("RunMode", "");
+					return "";
 				return _RunMode;
 			}
 		}
@@ -154,7 +149,7 @@ namespace JocysCom.ClassLibrary.Configuration
 					default: break;                // General Availability (GA) - Gold
 				}
 			}
-			
+
 			var haveRunMode = !string.IsNullOrEmpty(RunMode);
 			// If run mode is not specified then assume live.
 			var nonLive = haveRunMode && string.Compare(RunMode, "LIVE", true) != 0;
@@ -262,7 +257,7 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// This means that compiling assemblies under the same conditions (permalink)
 		/// would produce byte-for-byte equivalent binaries.
 		/// </remarks>
-		public static DateTime GetBuildDateTime(string filePath, TimeZoneInfo tzi = null)
+		public static DateTime GetBuildDateTime(string filePath)
 		{
 			// Constants related to the Windows PE file format.
 			const int PE_HEADER_OFFSET = 60; // 0x3C
@@ -364,9 +359,11 @@ namespace JocysCom.ClassLibrary.Configuration
 		{
 			get
 			{
-				string codeBase = Assembly.Location;
-				UriBuilder uri = new UriBuilder(codeBase);
-				string path = Uri.UnescapeDataString(uri.Path);
+				var codeBase = Assembly.Location;
+				if (string.IsNullOrEmpty(codeBase))
+					return codeBase;
+				var uri = new UriBuilder(codeBase);
+				var path = Uri.UnescapeDataString(uri.Path);
 				return path;
 			}
 		}
@@ -395,7 +392,9 @@ namespace JocysCom.ClassLibrary.Configuration
 				: value.Invoke(attribute);
 		}
 
-		public string GetAppDataPath(bool userLevel, string format, params object[] args)
+
+
+		public string GetAppDataPath(bool userLevel = false, string format = "", params object[] args)
 		{
 			// Get writable application folder.
 			var specialFolder = userLevel
@@ -411,7 +410,7 @@ namespace JocysCom.ClassLibrary.Configuration
 			return path;
 		}
 
-		public FileInfo GetAppDataFile(bool userLevel, string format, params object[] args)
+		public FileInfo GetAppDataFile(bool userLevel = false, string format = "", params object[] args)
 		{
 			var path = GetAppDataPath(userLevel, format, args);
 			return new FileInfo(path);

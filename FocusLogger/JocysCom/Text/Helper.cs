@@ -54,6 +54,34 @@ namespace JocysCom.ClassLibrary.Text
 			return s;
 		}
 
+		/// <summary>
+		/// Used to parametrize path. For example:
+		/// Convert "C:\Program Files\JocysCom\Focus Logger" to
+		/// "C:\Program Files\{Company}\{Product}"
+		/// </summary>
+		public static string Replace<T>(T o, string s, bool usePrefix = true, string customPrefix = null)
+		{
+			if (string.IsNullOrEmpty(s))
+				return s;
+			if (o == null)
+				return s;
+			var t = typeof(T);
+			var properties = t.GetProperties();
+			var prefix = string.IsNullOrEmpty(customPrefix) ? t.Name : customPrefix;
+			foreach (var p in properties)
+			{
+				var value = $"{p.GetValue(o, null)}";
+				if (string.IsNullOrEmpty(value))
+					continue;
+				var text = "{";
+				if (usePrefix && !string.IsNullOrEmpty(prefix))
+					text += prefix;
+				text += p.Name + "}";
+				s = Replace(s, value, text, StringComparison.OrdinalIgnoreCase);
+			}
+			return s;
+		}
+
 		/// <summary>Case insensitive replace.</summary>
 		public static string Replace(string s, string oldValue, string newValue, StringComparison comparison)
 		{
@@ -254,25 +282,37 @@ namespace JocysCom.ClassLibrary.Text
 
 		#endregion
 
-		public static string IdentText(int tabs, string s, char ident = '\t')
+		/// <summary>
+		/// Add or remove ident.
+		/// </summary>
+		/// <param name="s">String to ident.</param>
+		/// <param name="tabs">Positive - add ident, negative - remove ident.</param>
+		/// <param name="ident">Ident character</param>
+		public static string IdentText(string s, int tabs = 1, char ident = '\t')
 		{
 			if (tabs == 0)
 				return s;
-			if (s == null)
-				s = string.Empty;
+			if (string.IsNullOrEmpty(s))
+				return s;
 			var sb = new StringBuilder();
 			var tr = new StringReader(s);
-			var prefix = string.Empty;
-			for (var i = 0; i < tabs; i++)
-				prefix += ident;
+			var prefix = new string(ident, tabs);
 			string line;
 			while ((line = tr.ReadLine()) != null)
 			{
-				if (sb.Length > 0)
-					sb.AppendLine();
-				if (tabs > 0)
-					sb.Append(prefix);
-				sb.Append(line);
+				if (line != "")
+				{
+					if (tabs > 0)
+						sb.Append(prefix);
+					else
+					{
+						var index = 0;
+						while (index < line.Length && line[index] == ident && index < tabs)
+							index++;
+						line = line.Substring(index);
+					}
+				}
+				sb.AppendLine(line);
 			}
 			tr.Dispose();
 			return sb.ToString();

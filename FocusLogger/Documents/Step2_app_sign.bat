@@ -1,5 +1,5 @@
 @ECHO OFF
-COPY /Y "..\bin\Debug\publish\JocysCom.FocusLogger.exe" "JocysCom.FocusLogger.exe"
+COPY /Y "..\bin\Release\publish\JocysCom.FocusLogger.exe" "JocysCom.FocusLogger.exe"
 CALL:SIG "JocysCom.FocusLogger.exe"
 echo.
 pause

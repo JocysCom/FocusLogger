@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
 	<Authors>Jocys.com</Authors>
 	<Company>Jocys.com</Company>
 	<Product>Focus Logger</Product>
-	<Description>Find out which process or program is taking the window focus. In game, mouse and keyboard could start temporary stop responding if other program takes the focus. This tools could help to find out which program steals the focus.</Description>
+	<Description>Find out which process or program is taking the window focus. In game, mouse and keyborad could start temporary stop responding if other program takes the focus. This tools could help to find out which program steals the focus.</Description>
 	<ApplicationIcon>App.ico</ApplicationIcon>
-	<Version>1.0.9</Version>
+	<Version>1.1.6</Version>
 	<RepositoryUrl>https://github.com/JocysCom/FocusLogger</RepositoryUrl>
 	<PackageProjectUrl>https://www.jocys.com</PackageProjectUrl>
 	<Copyright>Copyright © Jocys.com 2021</Copyright>
@@ -20,6 +20,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

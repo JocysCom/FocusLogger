@@ -1,6 +1,7 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -29,8 +30,8 @@ namespace JocysCom.FocusLogger.Controls
 		{
 			var sender = (FrameworkElement)values[0];
 			var template = (FrameworkElement)values[1];
-			var cell = (DataGridCell)(template ?? sender).Parent;
 			var value = values[2];
+			var cell = (DataGridCell)(template ?? sender).Parent;
 			var item = (DataItem)cell.DataContext;
 			if (cell.Column == IsActiveImageColumn)
 			{
@@ -60,6 +61,11 @@ namespace JocysCom.FocusLogger.Controls
 			{
 				value = string.Format("{0:HH:mm:ss:fff}", item.Date);
 				cell.Opacity = 0.5;
+			}
+			if (cell.Column == ProcessPathColumn)
+			{
+				if (item.NonPath)
+					cell.Opacity = 0.3;
 			}
 			// Other.
 			return value;
@@ -101,9 +107,27 @@ namespace JocysCom.FocusLogger.Controls
 			using (var process = Process.GetProcessById(item.ProcessId))
 			{
 				item.ProcessName = process.ProcessName;
+				if (item.ProcessId == 0)
+				{
+					item.ProcessPath = "System Idle Process";
+					item.NonPath = true;
+				}
 				if (item.ProcessId > 0)
 				{
-					item.ProcessPath = process.MainModule?.FileName;
+					try
+					{
+						item.ProcessPath = process.MainModule?.FileName;
+					}
+					catch (Exception ex)
+					{
+						const int E_FAIL = unchecked((int)0x80004005); // -2147467259
+						item.ProcessPath = $"Error: {ex.Message}";
+						item.NonPath = true;
+						// If Win32 Acccess is denied exception, then...
+						if (ex is Win32Exception && ex.HResult == E_FAIL)
+							item.ProcessPath += " Run as Administrator";
+
+					}
 				}
 			}
 		}
@@ -123,8 +147,8 @@ namespace JocysCom.FocusLogger.Controls
 		{
 			if (MainWindow.IsClosing)
 				return;
-			_Timer.Start();
 			UpdateInfo();
+			_Timer.Start();
 		}
 
 		DataItem oldActiveItem = new DataItem();
@@ -144,6 +168,7 @@ namespace JocysCom.FocusLogger.Controls
 				// Get window which or child window of which receives keyboard input.
 				var activeHandle = NativeMethods.GetActiveWindow();
 				var activeItem = GetItemFromHandle(activeHandle, true);
+				// If active window changed then...
 				if (!activeItem.IsSame(oldActiveItem))
 				{
 					oldActiveItem = activeItem;
@@ -153,6 +178,7 @@ namespace JocysCom.FocusLogger.Controls
 				// Get foreground window.
 				var foregroundHandle = NativeMethods.GetForegroundWindow();
 				var foregroundItem = GetItemFromHandle(foregroundHandle);
+				// If foreground window changed then...
 				if (!foregroundItem.IsSame(oldForegroundItem))
 				{
 					oldForegroundItem = foregroundItem;

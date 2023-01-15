@@ -9,7 +9,6 @@ using System.IO;
 using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Xml;
-using System.Data;
 using System.Windows.Controls.Primitives;
 
 namespace JocysCom.ClassLibrary.Controls
@@ -18,31 +17,12 @@ namespace JocysCom.ClassLibrary.Controls
 	{
 		public static void EnableWithDelay(UIElement control)
 		{
-			Task.Run(async delegate {
+			Task.Run(async delegate
+			{
+				// Logical delay without blocking the current hardware thread.
 				await Task.Delay(500).ConfigureAwait(true);
 				control.Dispatcher.Invoke(() => control.IsEnabled = true);
 			});
-		}
-
-		/// <summary>
-		/// Set form TopMost if one of the application forms is top most.
-		/// </summary>
-		/// <param name="win"></param>
-		public static void CheckTopMost(Window win)
-		{
-			// If this form is not set as TopMost but one of the application forms is on TopMost then...
-			// Make this dialog form TopMost too or user won't be able to access it.
-			if (!win.Topmost && System.Windows.Forms.Application.OpenForms.Cast<System.Windows.Forms.Form>().Any(x => x.TopMost))
-				win.Topmost = true;
-		}
-
-		public static void AutoSizeByOpenForms(Window win, int addSize = -64)
-		{
-			var form = System.Windows.Forms.Application.OpenForms.Cast<System.Windows.Forms.Form>().First();
-			win.Width = form.Width + addSize;
-			win.Height = form.Height + addSize;
-			win.Top = form.Top - addSize / 2;
-			win.Left = form.Left - addSize / 2;
 		}
 
 		private static bool? _IsDesignModeWPF;
@@ -79,6 +59,10 @@ namespace JocysCom.ClassLibrary.Controls
 				ConformanceLevel = ConformanceLevel.Fragment,
 				OmitXmlDeclaration = true,
 				NamespaceHandling = NamespaceHandling.OmitDuplicates,
+				// XmlReader normalizes all newlines and converts '\r\n' to '\n'.
+				// This requires to save NewLines with  option which
+				// "Entitize" option replace '\r' with '&#xD;' in text node values.
+				NewLineHandling = NewLineHandling.Entitize,
 			});
 			var manager = new System.Windows.Markup.XamlDesignerSerializationManager(writer);
 			manager.XamlWriterMode = System.Windows.Markup.XamlWriterMode.Expression;
@@ -198,20 +182,25 @@ namespace JocysCom.ClassLibrary.Controls
 				control.Visibility = visibility;
 		}
 
-		/// <summary>
-		/// Convert Bitmap to image source.
-		/// </summary>
-		public static ImageSource GetImageSource(System.Drawing.Bitmap bitmap)
+		public static void SetItemsSource(ItemsControl grid, IBindingList list)
 		{
-			var bi = new System.Windows.Media.Imaging.BitmapImage();
-			var ms = new MemoryStream();
-			bitmap.Save(ms,  System.Drawing.Imaging.ImageFormat.Png);
-			bi.BeginInit();
-			bi.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-			bi.StreamSource = ms;
-			bi.EndInit();
-			ms.Dispose();
-			return bi;
+			if (list == null)
+			{
+				if (grid.ItemsSource is System.Windows.Data.BindingListCollectionView view)
+				{
+					grid.ItemsSource = null;
+					view.DetachFromSourceCollection();
+				}
+				return;
+			}
+			var currentView = (System.Windows.Data.BindingListCollectionView)grid.ItemsSource;
+			// If same list then...
+			if (currentView?.SourceCollection == list)
+				return;
+			var newView = new System.Windows.Data.BindingListCollectionView(list);
+			// Clear Items to avoid exception: "Items collection must be empty before using ItemsSource"
+			grid.Items.Clear();
+			grid.ItemsSource = newView;
 		}
 
 		private static void HookHyperlinks(object sender, TextChangedEventArgs e)
@@ -325,43 +314,91 @@ namespace JocysCom.ClassLibrary.Controls
 			return null;
 		}
 
+		public static void AddWeakHandlerOnWindowClosing(DependencyObject control, EventHandler<CancelEventArgs> handler)
+		{
+			var w = GetParent<Window>(control);
+			if (w == null)
+				return;
+			WeakEventManager<Window, CancelEventArgs>.AddHandler(w, nameof(Window.Closing), handler);
+		}
+
+		/// <summary>
+		/// Get all child controls with path.
+		/// Use regex to make shorter tabbed path:
+		/// var rx = new Regex("[^.]+[.]+");
+		/// var tabbedPath = rx.Replace(item.Path, "\t");
+		/// </summary>
+		public static Dictionary<string, DependencyObject> GetAll(string path, DependencyObject control, Type type = null, bool includeTop = false)
+		{
+			var controls = _GetAll(path, control, includeTop);
+			// If type is set then...
+			if (type == null)
+				return controls;
+			var filtered = type.IsInterface
+				? controls.Where(x => x.Value.GetType().GetInterfaces().Contains(type))
+				: controls.Where(x => type.IsAssignableFrom(x.Value.GetType()));
+			var results = filtered.ToDictionary(x => x.Key, y => y.Value);
+			return results;
+		}
+
+		private static Dictionary<string, DependencyObject> _GetAll(string path, DependencyObject control, bool includeTop = false)
+		{
+			if (control == null)
+				throw new ArgumentNullException(nameof(control));
+			// Create new list.
+			var controls = new Dictionary<string, DependencyObject>();
+			if (string.IsNullOrEmpty(path))
+				path = $"{control.GetType().Name} {(control as FrameworkElement)?.Name}".TrimEnd();
+			// Add top control if required.
+			if (includeTop && !controls.Values.Contains(control))
+			{
+				controls.Add(path, control);
+			}
+			// If control is Visual then then...
+			if (control is Visual || control is System.Windows.Media.Media3D.Visual3D)
+			{
+				var childrenCount = VisualTreeHelper.GetChildrenCount(control);
+				for (int i = 0; i < childrenCount; i++)
+				{
+					var child = VisualTreeHelper.GetChild(control, i);
+					var childKey = $"{path}[{i}].{child.GetType().Name} {(child as FrameworkElement)?.Name}".TrimEnd();
+					//controls.Add(childKey, child);
+					// Get children of children.
+					var pairs = _GetAll(childKey, child, true);
+					foreach (var pair in pairs)
+					{
+						if (!controls.ContainsValue(pair.Value))
+							controls.Add(pair.Key, pair.Value);
+					}
+				}
+			}
+			// If contorl is FrameworkElement then...
+			if (control is FrameworkElement || control is FrameworkContentElement)
+			{
+				var logicalChildren = LogicalTreeHelper.GetChildren(control).OfType<DependencyObject>().ToList();
+				for (int i = 0; i < logicalChildren.Count; i++)
+				{
+					var child = logicalChildren[i];
+					var childKey = $"{path}[{i}].{child.GetType().Name} {(child as FrameworkElement)?.Name}".TrimEnd();
+					//controls.Add(childKey, child);
+					// Get children of children.
+					var pairs = _GetAll(childKey, child, true);
+					foreach (var pair in pairs)
+					{
+						if (!controls.ContainsValue(pair.Value))
+							controls.Add(pair.Key, pair.Value);
+					}
+				}
+			}
+			return controls;
+		}
 
 		/// <summary>
 		/// Get all child controls.
 		/// </summary>
 		public static IEnumerable<DependencyObject> GetAll(DependencyObject control, Type type = null, bool includeTop = false)
 		{
-			if (control == null)
-				throw new ArgumentNullException(nameof(control));
-			// Create new list.
-			var controls = new List<DependencyObject>();
-			// Add top control if required.
-			if (includeTop)
-				controls.Add(control);
-			var visual = control as Visual;
-			if (visual != null)
-			{
-				// If control contains visual children then...
-				var childrenCount = VisualTreeHelper.GetChildrenCount(control);
-				for (int i = 0; i < childrenCount; i++)
-				{
-					var child = VisualTreeHelper.GetChild(control, i);
-					var children = GetAll(child, null, true);
-					controls.AddRange(children);
-				}
-			}
-			// Get logical children.
-			var logicalChildren = LogicalTreeHelper.GetChildren(control).OfType<DependencyObject>().ToList();
-			for (int i = 0; i < logicalChildren.Count; i++)
-			{
-				var child = logicalChildren[i];
-				var children = GetAll(child, null, true);
-				controls.AddRange(children);
-			}
-			// If type filter is not set then...
-			return (type == null)
-				? controls
-				: controls.Where(x => type.IsInterface ? x.GetType().GetInterfaces().Contains(type) : type.IsAssignableFrom(x.GetType()));
+			return GetAll(null, control, type, includeTop).Values.ToList();
 		}
 
 		/// <summary>
@@ -377,8 +414,9 @@ namespace JocysCom.ClassLibrary.Controls
 		public static void GetActiveControl(FrameworkElement control, out FrameworkElement activeControl, out string activePath)
 		{
 			string _activePath = null;
-			Invoke(() => {
-				_activePath = string.Format("/{0}", control.Name);
+			Invoke(() =>
+			{
+				_activePath = string.Format("/{0}", control?.Name);
 			});
 			activePath = _activePath;
 			// Return current control by default.
@@ -390,8 +428,9 @@ namespace JocysCom.ClassLibrary.Controls
 				control = System.Windows.Input.FocusManager.GetFocusedElement(control) as FrameworkElement;
 				if (control == null)
 					break;
-				Invoke(() => {
-					_activePath = string.Format("/{0}", control.Name);
+				Invoke(() =>
+				{
+					_activePath = string.Format("/{0}", control?.Name);
 				});
 
 				activePath += _activePath;
@@ -404,7 +443,7 @@ namespace JocysCom.ClassLibrary.Controls
 
 		#region Apply Grid Border Style
 
-		public static void ApplyBorderStyle(DataGrid grid, bool updateEnabledProperty = false)
+		public static void ApplyBorderStyle(DataGrid grid)
 		{
 			if (grid == null)
 				throw new ArgumentNullException(nameof(grid));
@@ -568,91 +607,6 @@ namespace JocysCom.ClassLibrary.Controls
 
 		#endregion
 
-		#region Center Window
-
-		public static void CenterWindowOnApplication(Window window)
-		{
-			// Get WFF window first.
-			var win = System.Windows.Application.Current?.MainWindow;
-			System.Drawing.Rectangle? r = null;
-			var isNormal = false;
-			if (win != null)
-			{
-				r = new System.Drawing.Rectangle((int)win.Left, (int)win.Top, (int)win.Width, (int)win.Height);
-				isNormal = win.WindowState == WindowState.Normal;
-			}
-			else
-			{
-				// Try to get top windows form.
-				var form = System.Windows.Forms.Application.OpenForms.Cast<System.Windows.Forms.Form>().FirstOrDefault();
-				if (form != null)
-				{
-					double l;
-					double t;
-					double w;
-					double h;
-					TransformToUnits(form.Left, form.Top, out l, out t);
-					TransformToUnits(form.Width, form.Height, out w, out h);
-					r = new System.Drawing.Rectangle((int)l, (int)t, (int)w, (int)h);
-					isNormal = form.WindowState == System.Windows.Forms.FormWindowState.Normal;
-				}
-			}
-			if (r.HasValue)
-			{
-				if (isNormal)
-				{
-					window.Left = r.Value.X + ((r.Value.Width - window.ActualWidth) / 2);
-					window.Top = r.Value.Y + ((r.Value.Height - window.ActualHeight) / 2);
-				}
-				else
-				{
-					// Get the form screen.
-					var screen = System.Windows.Forms.Screen.FromRectangle(r.Value);
-					double screenWidth = screen.WorkingArea.Width;
-					double screenHeight = screen.WorkingArea.Height;
-					window.Left = (screenWidth / 2) - (window.Width / 2);
-					window.Top = (screenHeight / 2) - (window.Height / 2);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Transforms device independent units (1/96 of an inch) to pixels.
-		/// </summary>
-		private static void TransformToPixels(double unitX, double unitY, out int pixelX, out int pixelY)
-		{
-			using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
-			{
-				pixelX = (int)((g.DpiX / 96) * unitX);
-				pixelY = (int)((g.DpiY / 96) * unitY);
-			}
-		}
-
-		/// <summary>
-		/// Transforms device pixels to independent units (1/96 of an inch).
-		/// </summary>
-		private static void TransformToUnits(int pixelX, int pixelY, out double unitX, out double unitY)
-		{
-			using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
-			{
-				unitX = (double)pixelX / (g.DpiX / 96);
-				unitY = (double)pixelY / (g.DpiX / 96);
-			}
-		}
-
-		public static bool GetMainFormTopMost()
-		{
-			var win = System.Windows.Application.Current?.MainWindow;
-			if (win != null)
-				return win.Topmost;
-			var form = System.Windows.Forms.Application.OpenForms.Cast<System.Windows.Forms.Form>().FirstOrDefault();
-			if (form != null)
-				return form.TopMost;
-			return false;
-		}
-
-		#endregion
-
 		#region Data Grid Functions
 
 		/// <summary>
@@ -728,29 +682,55 @@ namespace JocysCom.ClassLibrary.Controls
 
 		#region TextBoxBase
 
-		public static VerticalAlignment GetScrollVerticalAlignment(System.Windows.Controls.Primitives.TextBoxBase control)
+		public static VerticalAlignment GetScrollVerticalAlignment(ScrollViewer control)
 		{
 			// Vertical scroll position.
 			var offset = control.VerticalOffset;
 			// Vertical size of the scrollable content area.
-			var height = control.ViewportHeight;
+			var height = control.ExtentHeight;
 			// Vertical size of the visible content area.
-			var visibleView = control.ExtentHeight;
+			var visibleView = control.ViewportHeight;
+			//var scrollBarHeight = control.ActualHeight - control.ViewportHeight;
 			// Allow flexibility of 2 pixels.
 			var flex = 2;
-			if (offset + height - visibleView < flex)
+			if (height - offset - visibleView < flex)
 				return VerticalAlignment.Bottom;
 			if (offset < flex)
 				return VerticalAlignment.Top;
 			return VerticalAlignment.Center;
 		}
 
-		private static void AutoScroll(TextBoxBase control)
+		public static void AutoScroll(Control control)
 		{
-			var scrollPosition = GetScrollVerticalAlignment(control);
-			if (scrollPosition == VerticalAlignment.Bottom && control.IsVisible)
-				control.ScrollToEnd();
+			ScrollViewer sv = null;
+			if (!(control is ScrollViewer))
+			{
+				var all = GetAll<ScrollViewer>(control);
+				// Try to get one with visible vertical bar first otherwise get default.
+				sv = all
+					.Where(x => x.ComputedVerticalScrollBarVisibility == Visibility.Visible)
+					.FirstOrDefault() ?? all.FirstOrDefault();
+			}
+			//if (control is TextBoxBase tb)
+			//{
+			//	var border = (Border)VisualTreeHelper.GetChild(control, 0);
+			//	sv = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+			//}
+			if (sv != null)
+			{
+				var scrollPosition = GetScrollVerticalAlignment(sv);
+				if (scrollPosition == VerticalAlignment.Bottom && control.IsVisible)
+					sv.ScrollToEnd();
+			}
 		}
+
+		//public static void Measure(Control control)
+		//{
+		//	var available = LayoutInformation.GetLayoutSlot(control);
+		//	Size s = new Size(available.Width, available.Height);
+		//	control.Measure(s);
+		//	control.Arrange(available);
+		//}
 
 		public static void EnableAutoScroll(TextBoxBase control, bool enable = true)
 		{
@@ -768,14 +748,58 @@ namespace JocysCom.ClassLibrary.Controls
 		private static void TextBoxBase_Unloaded(object sender, RoutedEventArgs e)
 			=> EnableAutoScroll((TextBox)sender, false);
 
-		private static  void TextBoxBase_TextChanged(object sender, TextChangedEventArgs e)
+		private static void TextBoxBase_TextChanged(object sender, TextChangedEventArgs e)
 			=> AutoScroll((TextBox)sender);
 
 		private static void TextBoxBase_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
 			=> AutoScroll((TextBox)sender);
 
-
 		#endregion
+
+		// Contains unique list of control IDs for the applicaiton.
+		private static SortedSet<int> LoadedControls = new SortedSet<int>();
+
+		/// <summary>
+		/// Returnd false if displayed in desing mode (IDE).
+		/// Return true if control is not in the list of loaded controls.
+		/// Add control to the list of loaded controls.
+		/// IMPORTANT! Must be used in pair with AllowUnload.
+		/// </summary>
+		public static bool AllowLoad(FrameworkElement control)
+		{
+			if (IsDesignMode(control))
+				return false;
+			var code = control.GetHashCode();
+			return LoadedControls.Add(code);
+		}
+
+		/// <summary>
+		/// Returnd false if displayed in desing mode (IDE).
+		/// Return true if control is in the list of loaded controls.
+		/// Remove control from the list of loaded controls.
+		/// IMPORTANT! Must be used in pair with AllowLoad.
+		/// </summary>
+		public static bool AllowUnload(FrameworkElement control)
+		{
+			if (IsDesignMode(control))
+				return false;
+			var code = control.GetHashCode();
+			return LoadedControls.Remove(code);
+		}
+
+
+		/// <summary>
+		/// Returnd false if displayed in desing mode (IDE).
+		/// Return true if control is in the list of loaded controls.
+		/// Remove control from the list of loaded controls.
+		/// </summary>
+		public static bool IsLoaded(FrameworkElement control)
+		{
+			if (IsDesignMode(control))
+				return false;
+			var code = control.GetHashCode();
+			return LoadedControls.Contains(code);
+		}
 
 	}
 }

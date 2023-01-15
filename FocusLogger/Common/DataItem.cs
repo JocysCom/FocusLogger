@@ -35,7 +35,10 @@ namespace JocysCom.FocusLogger
 		public bool IsActive { get => _IsActive; set => SetProperty(ref _IsActive, value); }
 		bool _IsActive;
 
-	public bool IsSame(DataItem item)
+		public bool NonPath { get => _IsError; set => SetProperty(ref _IsError, value); }
+		bool _IsError;
+
+		public bool IsSame(DataItem item)
 		{
 			return
 			item.ProcessId == ProcessId &&

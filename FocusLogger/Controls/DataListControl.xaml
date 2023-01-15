@@ -234,10 +234,17 @@
 					x:Name="ProcessPathColumn"
 					Width="Auto"
 					x:FieldModifier="public"
-					Binding="{Binding ProcessPath}"
 					EditingElementStyle="{StaticResource TextBoxCell}"
 					ElementStyle="{StaticResource TextBlockCell}"
-					Header="Path" />
+					Header="Path">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="ProcessPath" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
 			</DataGrid.Columns>
 			<DataGrid.CellStyle>
 				<Style TargetType="DataGridCell">

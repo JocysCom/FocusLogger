@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace JocysCom.ClassLibrary.Controls
 {
@@ -102,6 +107,7 @@ namespace JocysCom.ClassLibrary.Controls
 				return Task.Run(async () =>
 				{
 					// Wait 1 second, which will allow to release the button.
+					// Logical delay without blocking the current hardware thread.
 					await Task.Delay(millisecondsDelay.Value).ConfigureAwait(true);
 					await BeginInvoke(action);
 				});
@@ -166,14 +172,19 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			try
 			{
-				System.Diagnostics.Process.Start(url);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+					Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					Process.Start("xdg-open", url);
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					Process.Start("open", url);
 			}
 			catch (System.ComponentModel.Win32Exception winEx)
 			{
 				if (winEx.ErrorCode == -2147467259)
 					MessageBoxShow(winEx.Message);
 			}
-			catch (Exception ex)
+			catch (System.Exception ex)
 			{
 				MessageBoxShow(ex.Message);
 			}
@@ -182,7 +193,7 @@ namespace JocysCom.ClassLibrary.Controls
 		private static void MessageBoxShow(string message)
 		{
 #if NETCOREAPP // .NET Core
-			System.Windows.Forms.MessageBox.Show(message);
+			System.Windows.MessageBox.Show(message);
 #elif NETSTANDARD // .NET Standard
 #elif NETFRAMEWORK // .NET Framework
 			// Requires: PresentationFramework.dll
@@ -229,13 +240,13 @@ namespace JocysCom.ClassLibrary.Controls
 			if (pi != null)
 				return pi;
 #else
-				// Try to find property by EntityFramework EdmScalarPropertyAttribute (System.Data.Entity.dll).
-				pi = t.GetProperties()
-					.Where(x =>
-						x.GetCustomAttributes(typeof(System.Data.Objects.DataClasses.EdmScalarPropertyAttribute), true)
-						.Cast<System.Data.Objects.DataClasses.EdmScalarPropertyAttribute>()
-						.Any(a => a.EntityKeyProperty))
-					.FirstOrDefault();
+			// Try to find property by EntityFramework EdmScalarPropertyAttribute (System.Data.Entity.dll).
+			pi = t.GetProperties()
+				.Where(x =>
+					x.GetCustomAttributes(typeof(System.Data.Objects.DataClasses.EdmScalarPropertyAttribute), true)
+					.Cast<System.Data.Objects.DataClasses.EdmScalarPropertyAttribute>()
+					.Any(a => a.EntityKeyProperty))
+				.FirstOrDefault();
 			if (pi != null)
 				return pi;
 
@@ -281,6 +292,40 @@ namespace JocysCom.ClassLibrary.Controls
 					: item.GetType().GetProperty(keyPropertyName);
 			return pi;
 		}
+
+		#region Add cool downs to controls.
+
+		// Default cool-down 1 second.
+		public static TimeSpan ControlCooldown = new TimeSpan(0, 0, 1);
+
+		public static Dictionary<object, DateTime> ControlCooldowns { get; } = new Dictionary<object, DateTime>();
+
+		/// <summary>
+		/// Returns true if control is on cool-down.
+		/// </summary>
+		/// <param name="control">Control to check.</param>
+		public static bool IsOnCooldown(object control, int? milliseconds = null)
+		{
+			lock (ControlCooldowns)
+			{
+				var now = DateTime.Now;
+				// Get expired controls.
+		        var keys = ControlCooldowns.Where(x => now > x.Value).Select(x => x.Key).ToList();
+				// Cleanup the list.
+				foreach (var key in keys)
+					ControlCooldowns.Remove(key);
+				// If on cool-down then...
+				if (ControlCooldowns.ContainsKey(control))
+					return true;
+				var cooldown = milliseconds.HasValue
+					? new TimeSpan(0, 0, 0, milliseconds.Value)
+					: ControlCooldown;
+				ControlCooldowns.Add(control, now.Add(cooldown));
+				return false;
+			}
+		}
+
+		#endregion
 
 	}
 }
