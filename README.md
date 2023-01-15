@@ -17,7 +17,7 @@ Digitally Signed Application v1.1.6.0 (2023-01-15)
   https://github.com/dotnet/core/blob/main/release-notes/6.0/supported-os.md
 - Microsoft .NET 6.0 (included with Windows Updates).
 
-  https://dotnet.microsoft.com/en-us/download/dotnet
+  https://dotnet.microsoft.com/download/dotnet
 
 ## Screenshots
 
