@@ -5,7 +5,7 @@
 		Removes temporary and user specific solution files.
 .NOTES
     Author:     Evaldas Jocys <evaldas@jocys.com>
-    Modified:   2023-01-13
+    Modified:   2023-06-06
 .LINK
     http://www.jocys.com
 #>
@@ -142,22 +142,34 @@ function ClearBuilds {
 	#Write-Output "Skipped: $global:skipCount, Removed: $global:removeCount";
 }
 # ----------------------------------------------------------------------------
-# Kill programs which could lock files in the project folders.
-function KillPrograms {
+# Kill tasks which could lock files in the project folders.
+function KillDeveloperTasks {
+	# TaskKill
+	#   /IM <name>  Name of the process to be terminated.
+	#   /T          Terminates the specified process and any child processes.
+	#   /F          Specifies to forcefully terminate the process(es).
+	#
 	# Kill Microsoft Build Engine. 
-	& TaskKill.exe @("/F", "/IM", "MsBuild.exe");
+	& TaskKill.exe @("/F", "/T", "/IM", "MsBuild.exe");
 	# Kill Microsoft Visual Studio Team Foundation Server End Task.
-	& TaskKill.exe @("/F", "/IM", "EndTask.exe");
+	& TaskKill.exe @("/F", "/T", "/IM", "EndTask.exe");
 	# Kill IIS Worker.
-	& TaskKill.exe @("/F", "/IM", "w3wp.exe");
+	& TaskKill.exe @("/F", "/T", "/IM", "w3wp.exe");
 	# Kill Node.js JavaScript runtime environment.
-	& TaskKill.exe @("/F", "/IM", "node.exe");
+	& TaskKill.exe @("/F", "/T", "/IM", "node.exe");
+	# Kill Web View Host.
+	& TaskKill.exe @("/F", "/T", "/IM", "WebViewHost.exe");
+	# Kill ChromeDriver. Ued for UI testing.
+	& TaskKill.exe @("/F", "/T", "/IM", "ChromeDriver.exe");
+	# Kill IIS Express.
+	& TaskKill.exe @("/F", "/T", "/IM", "iisexpress.exe");
+	# Kill IIS Express Tray Icon.
+	& TaskKill.exe @("/F", "/T", "/IM", "iisexpresstray.exe");
 }
 # ----------------------------------------------------------------------------
 function ClearCache {
 	Write-Host "Clear IIS Express configuration and remove temp files";
-	KillProcess "iisexpress.exe";
-	KillProcess "iisexpresstray.exe";
+	Start-Sleep -Seconds 2.0;
 	foreach ($p in $userProfilePaths) {
 		RemoveSubFoldersAndFiles "$p\Documents\My Web Sites" $true;
 	}
@@ -168,6 +180,7 @@ function ClearCache {
 	RemoveFiles "*.dbmdl";
 	RemoveFiles "*.user";
 	RemoveFiles "*.suo";
+	RemoveFiles "tsconfig.tsbuildinfo";
 }
 # ----------------------------------------------------------------------------
 function ResetPermissions {
@@ -248,7 +261,8 @@ function ShowMainMenu {
 		Clear-Host;
 		Write-Host;
 		Write-Host "User profiles will be affected: $namesAffected";
-		Write-Host "Please close Visual Studio before starting cleanup";
+		Write-Host "Please close Visual Studio before starting cleanup.";
+		Write-Host "The 'Clear' option will kill all developer tasks.";
 		Write-Host;
 		Write-Host "    1 - Clear Project builds";
 		Write-Host "    2 - Clear IIS and temp files";
@@ -257,14 +271,17 @@ function ShowMainMenu {
 		Write-Host "    0 - Clear all";
 		Write-Host;
 		Write-Host "    R - Reset Permissions";
+		Write-Host "    K - Kill Developer Tasks";
 		Write-Host;
 		$m = Read-Host -Prompt "Type option and press ENTER to continue";
 		Write-Host;
 		# Options:
+		IF ("$m" -eq "0" -or "$m" -eq "1" -or "$m" -eq "2" -or "$m" -eq "3" ) { KillDeveloperTasks; };
 		IF ("$m" -eq "0" -or "$m" -eq "1") { ClearBuilds; };
 		IF ("$m" -eq "0" -or "$m" -eq "2") { ClearCache; };
 		IF ("$m" -eq "0" -or "$m" -eq "3") { ClearCacheVS; };
 		IF ("$m" -eq "R") { ResetPermissions "$scriptPath"; };
+		IF ("$m" -eq "K") { KillDeveloperTasks; Start-Sleep -Seconds 2.0; };
 		# If option was choosen.
 		IF ("$m" -ne "") {
 			pause;

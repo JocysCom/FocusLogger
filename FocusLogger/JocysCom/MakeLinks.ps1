@@ -28,7 +28,7 @@
 
 .NOTES
     Author:     Evaldas Jocys <evaldas@jocys.com>
-    Modified:   2022-10-31
+    Modified:   2023-03-20
 .LINK
     http://www.jocys.com
 #>
@@ -156,8 +156,10 @@ foreach ($item in $items)
     $linkFullName = $item.FullName;
     # Get relative name.
     $linkRelativeName = $linkFullName.Substring($scriptPath.Length + 1);
-    # If file is not in directory then continue.
-    if (!$linkRelativeName.Contains("\")){
+	# If coding style file then allow to map.
+	if ($linkRelativeName -eq ".editorconfig") { }
+	# If file is not in directory then continue.
+	elseif (!$linkRelativeName.Contains("\")){
         continue;
     }
     # Original file for link to target.

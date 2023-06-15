@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -41,8 +42,10 @@ namespace JocysCom.ClassLibrary.Text
 			{
 				foreach (Match m in matches)
 				{
-					if (usePrefix && string.Compare(prefix, m.Groups["prefix"].Value, true) != 0) continue;
-					if (string.Compare(p.Name, m.Groups["property"].Value, true) != 0) continue;
+					if (usePrefix && string.Compare(prefix, m.Groups["prefix"].Value, true) != 0)
+						continue;
+					if (string.Compare(p.Name, m.Groups["property"].Value, true) != 0)
+						continue;
 					var format = m.Groups["format"].Value;
 					var value = p.GetValue(o, null);
 					var text = string.IsNullOrEmpty(format)
@@ -52,6 +55,22 @@ namespace JocysCom.ClassLibrary.Text
 				}
 			}
 			return s;
+		}
+
+		public static List<string> GetReplaceMacros<T>(bool usePrefix = true, string customPrefix = null)
+		{
+			var list = new List<string>();
+			var t = typeof(T);
+			var properties = t.GetProperties();
+			var prefix = string.IsNullOrEmpty(customPrefix) ? t.Name : customPrefix;
+			foreach (var p in properties)
+			{
+				var macro = usePrefix
+					? prefix + "." + p.Name
+					: p.Name;
+				list.Add(macro);
+			}
+			return list;
 		}
 
 		/// <summary>
@@ -140,13 +159,12 @@ namespace JocysCom.ClassLibrary.Text
 		}
 
 		/// <summary>
-		/// Get value from text [name]:\s*[value]. And parse to specific type.
+		/// Get value from text [name]:\s*[value].
 		/// </summary>
 		/// <param name="name">Prefix name.</param>
 		/// <param name="s">String to get value from.</param>
 		/// <param name="defaultValue">Override default value.</param>
-		/// <returns></returns>
-		public static T GetValue<T>(string name, string s, T defaultValue = default(T))
+		public static string GetValue(string name, string s, string defaultValue = "")
 		{
 			var pattern = string.Format(@"{0}:\s*(?<Value>[^\s]+)", name);
 			var rx = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -154,14 +172,7 @@ namespace JocysCom.ClassLibrary.Text
 			if (!m.Success)
 				return defaultValue;
 			var v = m.Groups["Value"].Value;
-			if (typeof(T) == typeof(string))
-				return (T)(object)v;
-			return JocysCom.ClassLibrary.Runtime.RuntimeHelper.TryParse(v, defaultValue);
-		}
-
-		public static string GetValue(string name, string s, string defaultValue = null)
-		{
-			return GetValue<string>(name, s, defaultValue);
+			return v;
 		}
 
 #if NETCOREAPP // .NET Core
@@ -288,7 +299,7 @@ namespace JocysCom.ClassLibrary.Text
 		/// <param name="s">String to ident.</param>
 		/// <param name="tabs">Positive - add ident, negative - remove ident.</param>
 		/// <param name="ident">Ident character</param>
-		public static string IdentText(string s, int tabs = 1, char ident = '\t')
+		public static string IdentText(string s, int tabs = 1, string ident = "\t")
 		{
 			if (tabs == 0)
 				return s;
@@ -296,23 +307,31 @@ namespace JocysCom.ClassLibrary.Text
 				return s;
 			var sb = new StringBuilder();
 			var tr = new StringReader(s);
-			var prefix = new string(ident, tabs);
+			var prefix = string.Concat(Enumerable.Repeat(ident, tabs));
 			string line;
-			while ((line = tr.ReadLine()) != null)
+			var lines = s.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+			for (int i = 0; i < lines.Length; i++)
 			{
+				line = lines[i];
 				if (line != "")
 				{
+					// If add idents then...
 					if (tabs > 0)
 						sb.Append(prefix);
-					else
+					// If remove idents then...
+					else if (tabs < 0)
 					{
-						var index = 0;
-						while (index < line.Length && line[index] == ident && index < tabs)
-							index++;
-						line = line.Substring(index);
+						var count = 0;
+						// Count how much idents could be removed
+						while (line.Substring(count * ident.Length, ident.Length) == ident && count < tabs)
+							count++;
+						line = line.Substring(count * ident.Length);
 					}
 				}
-				sb.AppendLine(line);
+				if (i < lines.Length - 1)
+					sb.AppendLine(line);
+				else
+					sb.Append(line);
 			}
 			tr.Dispose();
 			return sb.ToString();

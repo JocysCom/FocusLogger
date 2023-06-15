@@ -79,7 +79,11 @@
 					EditingElementStyle="{StaticResource TextBoxCell}"
 					ElementStyle="{StaticResource TextBlockCell}"
 					Header="Process Name" />
-				<DataGridTemplateColumn x:Name="IsActiveImageColumn" Width="SizeToCells" IsReadOnly="True">
+				<DataGridTemplateColumn
+					x:Name="IsActiveImageColumn"
+					Width="SizeToCells"
+					CanUserResize="False"
+					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
 						<TextBlock HorizontalAlignment="Center" Text="A" ToolTip="Window is Active" />
 					</DataGridTemplateColumn.Header>
@@ -115,7 +119,11 @@
 						</MultiBinding>
 					</DataGridTextColumn.Binding>
 				</DataGridTextColumn>
-				<DataGridTemplateColumn x:Name="HasMouseImageColumn" Width="SizeToCells" IsReadOnly="True">
+				<DataGridTemplateColumn
+					x:Name="HasMouseImageColumn"
+					Width="SizeToCells"
+					CanUserResize="False"
+					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
 						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Mouse" />
 					</DataGridTemplateColumn.Header>
@@ -151,7 +159,11 @@
 						</MultiBinding>
 					</DataGridTextColumn.Binding>
 				</DataGridTextColumn>
-				<DataGridTemplateColumn x:Name="HasKeyboardImageColumn" Width="SizeToCells" IsReadOnly="True">
+				<DataGridTemplateColumn
+					x:Name="HasKeyboardImageColumn"
+					Width="SizeToCells"
+					CanUserResize="False"
+					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
 						<TextBlock Text="K" ToolTip="Window has Keyboard" />
 					</DataGridTemplateColumn.Header>
@@ -187,9 +199,13 @@
 						</MultiBinding>
 					</DataGridTextColumn.Binding>
 				</DataGridTextColumn>
-				<DataGridTemplateColumn x:Name="HasCaretImageColumn" Width="SizeToCells" IsReadOnly="True">
+				<DataGridTemplateColumn
+					x:Name="HasCaretImageColumn"
+					Width="SizeToCells"
+					CanUserResize="False"
+					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Caret" />
+						<TextBlock HorizontalAlignment="Center" Text="C" ToolTip="Window has Caret" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>

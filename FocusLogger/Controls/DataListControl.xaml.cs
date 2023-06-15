@@ -1,5 +1,6 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
+using JocysCom.FocusLogger.Resources.Icons;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,20 +17,37 @@ namespace JocysCom.ClassLibrary.Controls
 		public InfoControl()
 		{
 			InitHelper.InitTimer(this, InitializeComponent);
-			if (!ControlsHelper.IsDesignMode(this))
-			{
-				// Get assemblies which will be used to select default (fists) and search for resources.
-				var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-				//var company = ((AssemblyCompanyAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCompanyAttribute))).Company;
-				var product = ((AssemblyProductAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyProductAttribute))).Product;
-				var description = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
-				DefaultHead = product;
-				DefaultBody = description;
-				SetHead(DefaultHead);
-				SetBodyInfo(DefaultBody);
-				InitRotation();
-			}
+			if (ControlsHelper.IsDesignMode(this))
+				return;
+			// Get assemblies which will be used to select default (fists) and search for resources.
+			var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+			//var company = ((AssemblyCompanyAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCompanyAttribute)))?.Company;
+			var product = ((AssemblyProductAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyProductAttribute)))?.Product;
+			var description = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute)))?.Description;
+			DefaultHead = product;
+			DefaultBody = description;
+			Reset();
+			InitRotation();
+			HelpProvider.OnMouseEnter += HelpProvider_OnMouseEnter;
+			HelpProvider.OnMouseLeave += HelpProvider_OnMouseLeave;
 		}
+
+		private void HelpProvider_OnMouseEnter(object sender, EventArgs e)
+		{
+			var control = (Control)sender;
+			var head = HelpProvider.GetHelpHead(control);
+			var body = HelpProvider.GetHelpBody(control, 128, true);
+			var image = HelpProvider.GetHelpImage(control);
+			SetHead(head);
+			SetBody(image, body);
+		}
+
+		private void HelpProvider_OnMouseLeave(object sender, EventArgs e)
+		{
+			Reset();
+		}
+
+		public InfoHelpProvider HelpProvider { get; set; } = new InfoHelpProvider();
 
 		#region ■ Properties
 
@@ -53,6 +71,12 @@ namespace JocysCom.ClassLibrary.Controls
 		#endregion
 
 		#region Set Text
+
+		public void Reset()
+		{
+			SetHead(DefaultHead);
+			SetBodyInfo(DefaultBody);
+		}
 
 		public void SetTitle(string format, params object[] args)
 		{
@@ -96,6 +120,20 @@ namespace JocysCom.ClassLibrary.Controls
 			// Set info with time.
 			SetBody(MessageBoxImage.Information, content);
 		}
+
+		public async void SetWithTimeout(MessageBoxImage image, string content = null, params object[] args)
+		{
+			SetBody(image, content, args);
+			var bodyText = BodyLabel.Text;
+			// The average minimal reading speed for adults is 16 characters per second.
+			// Add 4 extra seconds for realization and focus.
+			var waitSeconds = 4 + bodyText.Length / 16.0;
+			// Task code which waits for waitSeconds and executes code below.
+			await Task.Delay(TimeSpan.FromSeconds(waitSeconds));
+			if (bodyText == BodyLabel.Text)
+				Reset();
+		}
+
 
 		public void SetBody(MessageBoxImage image, string content = null, params object[] args)
 		{
@@ -190,6 +228,8 @@ namespace JocysCom.ClassLibrary.Controls
 
 		private void RotateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
+			if (RightIcon.Dispatcher.HasShutdownStarted)
+				return;
 #pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
 			RightIcon.Dispatcher.Invoke(() =>
 #pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs

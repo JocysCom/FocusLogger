@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -281,6 +282,14 @@ namespace JocysCom.ClassLibrary.Runtime
 
 		#endregion
 
+		/*
+		Copy: A duplicate of an object, excluding the state or data. Only the structure or 'shell' of the object is duplicated.
+		Clone: An exact duplicate of an object, including its state or data.
+		Shallow: Copying/cloning process where only the reference addresses are duplicated. Child objects are not independently duplicated.
+		Deep: Copying/cloning process where all objects, including child objects, are independently duplicated.
+		Lazy: Copying/cloning process that is deferred until the first write operation, optimizing performance by sharing data until modification.
+		*/
+
 		public static object CloneObject(object o)
 		{
 			if (o == null)
@@ -294,6 +303,130 @@ namespace JocysCom.ClassLibrary.Runtime
 					pi.SetValue(dest, pi.GetValue(o, null), null);
 			}
 			return dest;
+		}
+
+		/* Use example:
+			 var clones = new Dictionary<object, object>();
+			 // Clone ClassA
+			 ClassA cloneA = Clone(originalA, clones, CopyPropertiesExcludingCollections);
+			 cloneA.ClassBList = CloneCollection(classA.ClassBList, clones, CopyPropertiesExcludingCollections);
+			 cloneA.ClassCList = CloneCollection(classA.ClassCList, clones, CopyPropertiesExcludingCollections);
+		 */
+
+		/// <summary>
+		/// Clones an object of type T, including any properties that are collections.
+		/// </summary>
+		/// <typeparam name="T">The type of the object to clone.</typeparam>
+		/// <param name="source">The object to clone.</param>
+		/// <returns>A clone of the source object, with all properties except collections copied.</returns>
+		public static T Clone<T>(T source) where T : class, new()
+		{
+			var clones = new Dictionary<object, object>();
+			var clone = (T)Clone(source, clones, null);
+			return clone;
+		}
+
+		/// <summary>
+		/// Clones an object, including any properties that are collections.
+		/// </summary>
+		/// <param name="source">The object to clone.</param>
+		/// <param name="clones">A dictionary mapping original objects to their clones. This is used to prevent infinite recursion and ensure that all references in the object graph are correctly cloned.</param>
+		/// <param name="copyMethod">An optional delegate that can be used to customize how properties are copied. If this is null, the default CopyPropertiesExcludingCollections method is used.</param>
+		/// <returns>A clone of the source object, with all properties except collections copied.</returns>
+		public static object Clone(object source, Dictionary<object, object> clones, Action<object, object, Dictionary<object, object>> copyMethod = null)
+		{
+			// Don't serialize a null object, simply return the default for that object
+			if (source == null)
+				return default;
+			var sType = source.GetType();
+			// Check if we've already cloned this object
+			object clone;
+			if (clones.TryGetValue(source, out clone))
+				return clone;
+			// Create a shallow copy of the source object
+			var copy = Activator.CreateInstance(sType);
+			if (copyMethod == null)
+				copyMethod = CopyPropertiesIncludingCollections;
+			copyMethod(source, copy, clones);
+			clones.Add(source, copy);
+			return copy;
+		}
+
+		/// <summary>
+		/// Copies all properties from one object to another, including any properties that are collections.
+		/// </summary>
+		/// <param name="source">The object to copy properties from.</param>
+		/// <param name="destination">The object to copy properties to.</param>
+		public static void CopyPropertiesIncludingCollections(object source, object destination, Dictionary<object, object> clones)
+		{
+			if (source == null)
+				return;
+			var sType = source.GetType();
+			var properties = sType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			// Create a set of names of properties that are either marked as ForeignKey or are referred to by a ForeignKey attribute.
+			//var foreignKeyProperties = properties
+			//    .Where(p => Attribute.IsDefined(p, typeof(ForeignKeyAttribute)))
+			//    .ToArray(); 
+			//var foreignKeyPropertyNames = foreignKeyProperties
+			//    .Select(x => x.GetCustomAttribute<ForeignKeyAttribute>()?.Name!)
+			//    .ToArray();
+			foreach (var property in properties)
+			{
+				// If this property has a ForeignKey attribute or defined foreign key then skip it
+				//if (foreignKeyProperties.Contains(property) || foreignKeyPropertyNames.Contains(property.Name))
+				//    continue;
+				if (!property.CanRead || !property.CanWrite)
+					continue;
+				var value = property.GetValue(source);
+				if (value == null)
+				{
+					property.SetValue(destination, value);
+					continue;
+				}
+				var valueType = value.GetType();
+				if (valueType.IsValueType)
+				{
+					// Don't clone SQL Primary Keys.
+					//if (property.GetCustomAttribute(typeof(System.ComponentModel.DataAnnotations.KeyAttribute)) == null)
+					property.SetValue(destination, value);
+					continue;
+				}
+				// If the property is an IEnumerable (Array, List, Set, etc.)
+				if (value is IEnumerable collection)
+				{
+					// Clone items first.
+					var clonedItems = new ArrayList();
+					foreach (var item in collection)
+						clonedItems.Add(Clone(item, clones));
+					// Create a new collection of the same type and add the cloned items to it.
+					// If the original collection was an IList (Array) then...
+					if (value is IList)
+					{
+						var newIlist = (IList)Activator.CreateInstance(valueType, clonedItems.Count);
+						foreach (var item in clonedItems)
+							newIlist.Add(item);
+						value = newIlist;
+					}
+					if (value is ICollection<dynamic>)
+					{
+						var newCollection = (ICollection<dynamic>)Activator.CreateInstance(valueType);
+						foreach (var item in clonedItems)
+							newCollection.Add(item);
+						value = newCollection;
+					}
+					property.SetValue(destination, value);
+					continue;
+				}
+				// If we've already cloned this object then...
+				if (clones.ContainsKey(value))
+				{
+					// Use the existing clone.
+					property.SetValue(destination, clones[value]);
+					continue;
+				}
+				var clone = Clone(value, clones);
+				property.SetValue(destination, clone);
+			}
 		}
 
 		/// <summary>

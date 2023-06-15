@@ -665,7 +665,7 @@ namespace JocysCom.ClassLibrary.Controls
 				else
 				{
 					// Remove items which should not be selected.
-					var itemsToUnselect = grid.SelectedItems.Cast<object>().Except(selectedItems);
+					var itemsToUnselect = grid.SelectedItems.Cast<object>().Except(selectedItems).ToArray();
 					foreach (var item in itemsToUnselect)
 						grid.SelectedItems.Remove(item);
 					var itemsToSelect = selectedItems.Except(grid.SelectedItems.Cast<object>());

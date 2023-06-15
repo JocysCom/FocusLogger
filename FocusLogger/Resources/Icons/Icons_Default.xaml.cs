@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace JocysCom.FocusLogger
+namespace JocysCom.FocusLogger.Resources.Icons
 {
 	partial class Icons_Default : ResourceDictionary
 	{
