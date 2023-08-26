@@ -40,7 +40,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="PowerShell.exe -Command &quot;New-Item -ItemType Directory -Force -Path \&quot;$(ProjectDir)Resources\&quot; | Out-Null&quot;&#xD;&#xA;PowerShell.exe -Command &quot;(Get-Date).ToString(\&quot;o\&quot;) | Out-File \&quot;$(ProjectDir)Resources\BuildDate.txt\&quot;&quot;" />
+    <Exec Command="PowerShell.exe -NoProfile -Command &quot;if(-not (Test-Path -Path '$(ProjectDir)Resources')) { New-Item -ItemType Directory -Force -Path '$(ProjectDir)Resources' }&quot;&#xD;&#xA;PowerShell.exe -NoProfile -Command &quot;(Get-Date).ToString('o') | Out-File -Force '$(ProjectDir)Resources\BuildDate.txt'&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>
