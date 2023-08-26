@@ -31,11 +31,6 @@ namespace JocysCom.FocusLogger
 		{
 			IsClosing = true;
 		}
-
-        private void InfoPanel_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-    }
+	}
 
 }
