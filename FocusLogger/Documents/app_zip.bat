@@ -8,7 +8,7 @@ SET zip=%wra% a -ep
 IF NOT EXIST Files\nul MKDIR Files
 ::-------------------------------------------------------------
 :: Archive Files
-CALL:CRE Files  JocysCom.FocusLogger.exe .exe
+CALL:CRE Files  JocysCom.FocusLogger .exe
 ECHO.
 pause
 GOTO:EOF
