@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JocysCom.ClassLibrary.Configuration
 {
@@ -55,7 +57,7 @@ namespace JocysCom.ClassLibrary.Configuration
 
 		public static bool IsDifferent(string name, byte[] bytes)
 		{
-			if (bytes == null)
+			if (bytes is null)
 				throw new ArgumentNullException(nameof(bytes));
 			var fi = new FileInfo(name);
 			var isDifferent = false;
@@ -154,7 +156,6 @@ namespace JocysCom.ClassLibrary.Configuration
 		}
 
 		#endregion
-
 
 	}
 }

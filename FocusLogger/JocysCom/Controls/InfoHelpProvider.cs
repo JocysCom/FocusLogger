@@ -128,6 +128,8 @@ namespace JocysCom.ClassLibrary.Controls
 
 		public static string RemoveMultispace(string s)
 		{
+			if (string.IsNullOrEmpty(s))
+				return s;
 			// Replace multiple spaces.
 			s = RxMultiSpace.Replace(s, " ");
 			return s;
