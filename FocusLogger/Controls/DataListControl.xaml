@@ -21,19 +21,22 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
-			<ToolBar Style="{StaticResource MainToolBar}">
-				<Button
-					Name="ClearButton"
-					HorizontalAlignment="Right"
-					Click="ClearButton_Click"
-					Style="{StaticResource ToolBarButton}">
-					<StackPanel Style="{StaticResource ButtonStackPanel}">
-						<ContentControl Content="{StaticResource Icon_Delete}" Style="{StaticResource ButtonContentControl}" />
-						<Label Content="Clear" Style="{StaticResource ButtonLabel}" />
-					</StackPanel>
-				</Button>
-			</ToolBar>
+		<ToolBarPanel
+			Grid.Row="0"
+			HorizontalAlignment="Right"
+			Style="{StaticResource MainToolBarPanel}">
+			<Button
+				Name="ClearButton"
+				Margin="2"
+				Padding="3,0,3,0"
+				Background="Transparent"
+				Click="ClearButton_Click">
+				<StackPanel Style="{StaticResource ButtonStackPanel}">
+					<ContentControl Content="{StaticResource Icon_Delete}" Focusable="False" />
+					<Label Content="Clear" Style="{StaticResource ButtonLabel}" />
+				</StackPanel>
+			</Button>
+
 		</ToolBarPanel>
 		<DataGrid
 			x:Name="MainDataGrid"
@@ -85,15 +88,17 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock HorizontalAlignment="Center" Text="A" ToolTip="Window is Active" />
+						<TextBlock
+							HorizontalAlignment="Center"
+							Text="A"
+							ToolTip="Window is Active" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<ContentControl
 								x:Name="IsActiveIcon"
 								Width="12"
-								Height="12"
-								Style="{StaticResource ButtonContentControl}">
+								Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -125,15 +130,17 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Mouse" />
+						<TextBlock
+							HorizontalAlignment="Center"
+							Text="M"
+							ToolTip="Window has Mouse" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<ContentControl
 								x:Name="HasMouseIcon"
 								Width="12"
-								Height="12"
-								Style="{StaticResource ButtonContentControl}">
+								Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -172,8 +179,7 @@
 							<ContentControl
 								x:Name="HasKeyboardIcon"
 								Width="12"
-								Height="12"
-								Style="{StaticResource ButtonContentControl}">
+								Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -205,15 +211,17 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock HorizontalAlignment="Center" Text="C" ToolTip="Window has Caret" />
+						<TextBlock
+							HorizontalAlignment="Center"
+							Text="C"
+							ToolTip="Window has Caret" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<ContentControl
 								x:Name="HasCaretIcon"
 								Width="12"
-								Height="12"
-								Style="{StaticResource ButtonContentControl}">
+								Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />

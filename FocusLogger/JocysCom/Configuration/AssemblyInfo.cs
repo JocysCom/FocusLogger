@@ -26,7 +26,7 @@ namespace JocysCom.ClassLibrary.Configuration
 			{
 				lock (_EntryLock)
 				{
-					if (_Entry == null)
+					if (_Entry is null)
 						_Entry = new AssemblyInfo();
 					return _Entry;
 				}
@@ -122,7 +122,7 @@ namespace JocysCom.ClassLibrary.Configuration
 		{
 			get
 			{
-				if (_RunMode == null)
+				if (_RunMode is null)
 					// TODO: Standardize configuration provider XML, JSON, INI, Registry, etc...
 					// https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration-providers
 					//_RunMode = SettingsParser.Current.Parse("RunMode", "");
@@ -309,7 +309,7 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// </remarks>
 		public static DateTime GetBuildDateTime(Assembly assembly, TimeZoneInfo tzi = null)
 		{
-			if (assembly == null)
+			if (assembly is null)
 				throw new ArgumentNullException(nameof(assembly));
 			var names = assembly.GetManifestResourceNames();
 			var dt = default(DateTime);
@@ -388,7 +388,7 @@ namespace JocysCom.ClassLibrary.Configuration
 		string GetAttribute<T>(Func<T, string> value) where T : Attribute
 		{
 			T attribute = (T)Attribute.GetCustomAttribute(Assembly, typeof(T));
-			return attribute == null
+			return attribute is null
 				? ""
 				: value.Invoke(attribute);
 		}

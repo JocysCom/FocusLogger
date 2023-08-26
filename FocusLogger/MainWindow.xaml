@@ -9,6 +9,7 @@
 	Title="MainWindow"
 	Width="920"
 	Height="480"
+	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
 	Closing="Window_Closing"
 	mc:Ignorable="d">
 	<Grid>

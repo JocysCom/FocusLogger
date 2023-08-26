@@ -10,7 +10,7 @@ namespace JocysCom.ClassLibrary.Text
 
 	public static class Helper
 	{
-		private static readonly Regex tagRx = new Regex("{((?<prefix>[0-9A-Z]+)[.])?(?<property>[0-9A-Z]+)(:(?<format>[^{}]+))?}", RegexOptions.IgnoreCase);
+		private static readonly Regex tagRx = new Regex("{((?<prefix>[\\w]+)[.])?(?<property>[\\w]+)(:(?<format>[^{}]+))?}", RegexOptions.IgnoreCase);
 
 		/// <summary>
 		/// Replace {TypeName.PropertyName[:format]} or {customPrefix.propertyName[:format]} pattern with the property value of the object.
@@ -48,6 +48,47 @@ namespace JocysCom.ClassLibrary.Text
 						continue;
 					var format = m.Groups["format"].Value;
 					var value = p.GetValue(o, null);
+					var text = string.IsNullOrEmpty(format)
+						? string.Format("{0}", value)
+						: string.Format("{0:" + format + "}", value);
+					s = Replace(s, m.Value, text, StringComparison.OrdinalIgnoreCase);
+				}
+			}
+			return s;
+		}
+
+		/// <summary>
+		/// Replace {TypeName.PropertyName[:format]} or {customPrefix.propertyName[:format]} pattern with the property value of the object.
+		/// </summary>
+		/// <remarks>
+		/// Example 1: Supply current date. Use {customPrefix.propertyName[:format]}.
+		///	var template = "file_{date.Now:yyyyMMdd}.txt";
+		/// var fileName = JocysCom.ClassLibrary.Text.Helper.Replace(template, DateTime.Now, true, "date");
+		///
+		/// Example 2: Supply profile object. Use {TypeName.PropertyName[:format]}.
+		///	var template = "Profile full name: {Profile.first_name} {Profile.last_name}";
+		/// var fileName = JocysCom.ClassLibrary.Text.Helper.Replace(template, profile);
+		/// </remarks>
+		/// <param name="s">String template</param>
+		/// <param name="o">Object values.</param>
+		public static string ReplaceDictionary(string s, Dictionary<string, object> o, bool usePrefix = true, string customPrefix = null)
+		{
+			if (string.IsNullOrEmpty(s))
+				return s;
+			if (o == null)
+				return s;
+			var prefix = customPrefix;
+			var matches = tagRx.Matches(s);
+			foreach (var key in o.Keys)
+			{
+				foreach (Match m in matches)
+				{
+					if (usePrefix && string.Compare(prefix, m.Groups["prefix"].Value, true) != 0)
+						continue;
+					if (string.Compare(key, m.Groups["property"].Value, true) != 0)
+						continue;
+					var format = m.Groups["format"].Value;
+					var value = o[key];
 					var text = string.IsNullOrEmpty(format)
 						? string.Format("{0}", value)
 						: string.Format("{0:" + format + "}", value);
@@ -136,9 +177,9 @@ namespace JocysCom.ClassLibrary.Text
 		/// <remarks>This is very fast search.</remarks>
 		public static int IndexOf(byte[] input, byte[] value, int startIndex = 0)
 		{
-			if (input == null)
+			if (input is null)
 				throw new ArgumentNullException(nameof(input));
-			if (value == null)
+			if (value is null)
 				throw new ArgumentNullException(nameof(value));
 			var endIndex = input.Length - value.Length;
 			int v;
@@ -175,10 +216,6 @@ namespace JocysCom.ClassLibrary.Text
 			return v;
 		}
 
-#if NETCOREAPP // .NET Core
-#elif NETSTANDARD // .NET Standard
-#else // .NET Framework
-
 		/// <summary>
 		/// Convert string value to an escaped C# string literal.
 		/// </summary>
@@ -201,8 +238,6 @@ namespace JocysCom.ClassLibrary.Text
 			}
 		}
 
-#endif
-
 		#region Word Wrap
 
 		// http://www.codeproject.com/Articles/51488/Implementing-Word-Wrap-in-C
@@ -217,7 +252,7 @@ namespace JocysCom.ClassLibrary.Text
 		/// <returns>The modified text</returns>
 		public static string WrapText(string text, int width, bool useSpaces = false)
 		{
-			if (text == null)
+			if (text is null)
 				throw new ArgumentNullException(nameof(text));
 			// Lucidity check
 			if (width < 1)
@@ -345,7 +380,7 @@ namespace JocysCom.ClassLibrary.Text
 
 		public static string BytesToStringBlock(byte[] bytes, bool addIndex, bool addHex, bool addText, int offset = 0, int size = -1, int? maxDisplayLines = null)
 		{
-			if (bytes == null)
+			if (bytes is null)
 				throw new ArgumentNullException(nameof(bytes));
 			var builder = new StringBuilder();
 			var hx = new StringBuilder();
