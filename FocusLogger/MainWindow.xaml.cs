@@ -7,8 +7,7 @@ namespace JocysCom.FocusLogger
 	public partial class MainWindow : Window
 	{
 		/// <summary>
-		/// Initializes a new instance of the MainWindow class.
-		/// Sets up control invocation context, loads components, and sets window info.
+		/// Initializes a new instance of the <see cref="MainWindow"/> class, sets up control invocation context, loads the UI, and populates application metadata for display.
 		/// </summary>
 		public MainWindow()
 		{
@@ -18,7 +17,7 @@ namespace JocysCom.FocusLogger
 		}
 
 		/// <summary>
-		/// Sets the main window title using assembly/application info for branding and version display.
+		/// Loads assembly metadata and sets the window title to display application info, ensuring users see current build details as part of branding and support diagnostics.
 		/// </summary>
 		void LoadHelpAndInfo()
 		{
@@ -28,22 +27,18 @@ namespace JocysCom.FocusLogger
 		}
 
 		/// <summary>
-		/// Reference to the main info/help control displayed on the window.
+		/// Reference to the main info/help control displayed in the UI. Populated by XAML.
 		/// </summary>
 		public InfoControl HMan;
 
 		/// <summary>
-		/// Global flag to signal that the main window is closing.
-		/// Allows other components (e.g., timer threads in data/logging controls) to react and terminate gracefully.
+		/// Indicates whether the application is in the process of closing. This static flag is checked by background operations (such as timer loops in DataListControl) to prevent actions during shutdown.
 		/// </summary>
 		public static bool IsClosing;
 
 		/// <summary>
-		/// Handles the window closing event.
-		/// Sets the IsClosing flag to inform dependent components of shutdown, allowing for safe resource cleanup.
+		/// Handles the window closing event. Sets the <see cref="IsClosing"/> flag to true so that background processes (e.g., focus update timers) can safely detect shutdown and avoid race conditions or invalid operations during exit.
 		/// </summary>
-		/// <param name="sender">The sender object.</param>
-		/// <param name="e">Cancellation event arguments.</param>
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			IsClosing = true;
