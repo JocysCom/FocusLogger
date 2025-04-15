@@ -34,18 +34,21 @@ namespace JocysCom.FocusLogger
 
 		/// <summary>
 		/// Reference to an InfoControl instance, presumably for managing or displaying help information within the UI.
+		/// InfoControl is defined in the related file InfoControl.xaml and its code-behind, used here to present help or guidance content within the main window.
 		/// </summary>
 		public InfoControl HMan;
 
 		/// <summary>
 		/// Static flag indicating when the main window is in the process of closing,
 		/// useful for other components to check whether the application is shutting down.
+		/// This helps coordinate shutdown logic across multiple controls or background tasks.
 		/// </summary>
 		public static bool IsClosing;
 
 		/// <summary>
 		/// Handles the window closing event, marking the IsClosing flag as true.
-		/// This ensures proper signaling for shutdown-related logic or cancelation if needed.
+		/// This ensures proper signaling for shutdown-related logic or cancellation if needed,
+		/// such as stopping background logging or releasing resources gracefully.
 		/// </summary>
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
