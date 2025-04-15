@@ -18,8 +18,15 @@ namespace JocysCom.FocusLogger
 		/// </summary>
 		public MainWindow()
 		{
+			// Initialize the UI thread context to enable safe cross-thread operations on controls,
+			// which is a foundational setup step for a responsive WPF application handling user focus logging.
 			ControlsHelper.InitInvokeContext();
+
+			// Load and apply all UI components defined in the corresponding XAML file.
 			InitializeComponent();
+
+			// Dynamically set the window title using assembly metadata,
+			// ensuring the UI reflects accurate version and descriptive information for users.
 			LoadHelpAndInfo();
 		}
 
@@ -30,8 +37,14 @@ namespace JocysCom.FocusLogger
 		/// </summary>
 		void LoadHelpAndInfo()
 		{
+			// Get the assembly that contains this code to extract metadata like version and product information.
 			var assembly = Assembly.GetExecutingAssembly();
+
+			// Utilize the AssemblyInfo helper class to format and retrieve the desired title string,
+			// choosing which parts such as version or description to include, to present a concise app identity.
 			var ai = new ClassLibrary.Configuration.AssemblyInfo();
+
+			// Set the window's title property to the dynamically generated assembly title string.
 			Title = ai.GetTitle(true, false, true, false, false);
 		}
 
@@ -42,7 +55,7 @@ namespace JocysCom.FocusLogger
 		/// This allows the main window to present context-sensitive help or guidance,
 		/// enhancing the user experience and supporting the application's goal of logging and user focus assistance.
 		/// </summary>
-		public InfoControl HMan;
+		public InfoControl HMan; // Reference to help/info UI control embedded in the main window.
 
 		/// <summary>
 		/// Static flag to indicate if the main window is currently closing.
@@ -50,7 +63,7 @@ namespace JocysCom.FocusLogger
 		/// and gracefully terminate operations such as logging or resource handling,
 		/// which is essential to maintain application stability and data integrity on exit.
 		/// </summary>
-		public static bool IsClosing;
+		public static bool IsClosing; // Indicates whether the main window is in the process of closing.
 
 		/// <summary>
 		/// Event handler for the window's Closing event.
@@ -60,6 +73,7 @@ namespace JocysCom.FocusLogger
 		/// </summary>
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
+			// Mark that the application is closing to notify subsystems and prevent further operations.
 			IsClosing = true;
 		}
 	}
