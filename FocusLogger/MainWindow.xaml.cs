@@ -7,17 +7,20 @@ namespace JocysCom.FocusLogger
 	public partial class MainWindow : Window
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MainWindow"/> class, sets up control invocation context, loads the UI, and populates application metadata for display.
+		/// Initializes a new instance of the <see cref="MainWindow"/> class.
+		/// Sets up the invoke context for safe cross-thread UI updates, initializes UI components,
+		/// and loads application metadata. Called on application startup as specified in App.xaml.
 		/// </summary>
 		public MainWindow()
 		{
+			// Ensure invoke context is initialized for cross-thread UI updates, which are common due to background monitoring.
 			ControlsHelper.InitInvokeContext();
 			InitializeComponent();
 			LoadHelpAndInfo();
 		}
 
 		/// <summary>
-		/// Loads assembly metadata and sets the window title to display application info, ensuring users see current build details as part of branding and support diagnostics.
+		/// Loads application metadata to set a descriptive window title. Displays detailed version info for user support and diagnostics.
 		/// </summary>
 		void LoadHelpAndInfo()
 		{
@@ -27,17 +30,19 @@ namespace JocysCom.FocusLogger
 		}
 
 		/// <summary>
-		/// Reference to the main info/help control displayed in the UI. Populated by XAML.
+		/// Holds a reference to the main help or information panel for the window, typically representing the UI help area.
 		/// </summary>
 		public InfoControl HMan;
 
 		/// <summary>
-		/// Indicates whether the application is in the process of closing. This static flag is checked by background operations (such as timer loops in DataListControl) to prevent actions during shutdown.
+		/// Static flag used for graceful shutdown signaling to child components (like periodic timers in controls) during application closure.
+		/// Checked by controls (such as DataListControl) to halt background tasks safely as the window closes.
 		/// </summary>
 		public static bool IsClosing;
 
 		/// <summary>
-		/// Handles the window closing event. Sets the <see cref="IsClosing"/> flag to true so that background processes (e.g., focus update timers) can safely detect shutdown and avoid race conditions or invalid operations during exit.
+		/// Handles the window closing event.
+		/// Sets <see cref="IsClosing"/> to true, allowing child controls and background operations to detect shutdown and terminate cleanly.
 		/// </summary>
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
