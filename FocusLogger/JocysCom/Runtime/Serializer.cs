@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace JocysCom.ClassLibrary.Runtime
 				attempts -= 1;
 				try
 				{
-					// CWE-73: External Control of File Name or Path
+					// SUPPRESS: CWE-73: External Control of File Name or Path
 					// Note: False Positive. File path is not externally controlled by the user.
 					return System.IO.File.ReadAllBytes(path);
 				}
@@ -61,7 +62,7 @@ namespace JocysCom.ClassLibrary.Runtime
 				try
 				{
 					// WriteAllBytes will lock file for writing and reading.
-					// CWE-73: External Control of File Name or Path
+					// SUPPRESS: CWE-73: External Control of File Name or Path
 					// Note: False Positive. File path is not externally controlled by the user.
 					System.IO.File.WriteAllBytes(path, bytes);
 					return;
@@ -82,32 +83,24 @@ namespace JocysCom.ClassLibrary.Runtime
 
 		#region JSON
 
-		// Notes: Use [DataMember(EmitDefaultValue = false, IsRequired = false)] attribute
-		// if you don't want to serialize default values.
+		/// <summary>Cache data for speed.</summary>
+		/// <remarks>Cache allows for this class to work 20 times faster.</remarks>
+		private static ConcurrentDictionary<Type, DataContractJsonSerializer> JsonSerializers = new ConcurrentDictionary<Type, DataContractJsonSerializer>();
 
-		static object JsonSerializersLock = new object();
-		static Dictionary<Type, DataContractJsonSerializer> JsonSerializers;
-		public static DataContractJsonSerializer GetJsonSerializer(Type type, DataContractJsonSerializerSettings settings = null)
+		static DataContractJsonSerializer GetJsonSerializer(Type type, DataContractJsonSerializerSettings settings = null)
 		{
-			lock (JsonSerializersLock)
-			{
-				if (JsonSerializers is null) JsonSerializers = new Dictionary<Type, DataContractJsonSerializer>();
-				if (!JsonSerializers.ContainsKey(type))
-				{
-					// Simple dictionary format looks like this: { "Key1": "Value1", "Key2": "Value2" }
-					// DataContractJsonSerializerSettings requires .NET 4.5
-					if (settings is null)
-					{
-						settings = new DataContractJsonSerializerSettings();
-						settings.IgnoreExtensionDataObject = true;
-						settings.UseSimpleDictionaryFormat = true;
-					}
-					var serializer = new DataContractJsonSerializer(type, settings);
-					JsonSerializers.Add(type, serializer);
-				}
-			}
-			return JsonSerializers[type];
+			if (type == null)
+				return null;
+			return JsonSerializers.GetOrAdd(type, x => new DataContractJsonSerializer(type, settings));
 		}
+
+		// DataContractJsonSerializerSettings requires .NET 4.5
+		static DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings()
+		{
+			IgnoreExtensionDataObject = true,
+			// Simple dictionary format looks like this: { "Key1": "Value1", "Key2": "Value2" }
+			UseSimpleDictionaryFormat = true,
+		};
 
 		public static Func<object, Encoding, string> _SerializeToJson;
 		public static Func<string, Type, Encoding, object> _DeserializeFromJson;
@@ -295,7 +288,7 @@ namespace JocysCom.ClassLibrary.Runtime
 			var doc = new XmlDocument();
 			doc.XmlResolver = null;
 			// Settings used to protect from:
-			// CWE-611: Improper Restriction of XML External Entity Reference('XXE')
+			// SUPPRESS: CWE-611: Improper Restriction of XML External Entity Reference('XXE')
 			// https://cwe.mitre.org/data/definitions/611.html
 			var settings = new XmlReaderSettings();
 			settings.DtdProcessing = DtdProcessing.Ignore;
@@ -457,7 +450,7 @@ namespace JocysCom.ClassLibrary.Runtime
 			// Use specified encoding if Byte Order Mark (BOM) is missing.
 			var sr = new StreamReader(ms, encoding ?? Encoding.UTF8, true);
 			// Settings used to protect from
-			// CWE-611: Improper Restriction of XML External Entity Reference('XXE')
+			// SUPPRESS: CWE-611: Improper Restriction of XML External Entity Reference('XXE')
 			// https://cwe.mitre.org/data/definitions/611.html
 			var settings = new XmlReaderSettings();
 			settings.DtdProcessing = DtdProcessing.Ignore;
@@ -499,7 +492,7 @@ namespace JocysCom.ClassLibrary.Runtime
 			// You should use "StreamReader" on file content, because this method will strip BOM properly
 			// when converting bytes to string.
 			// Settings used to protect from
-			// CWE-611: Improper Restriction of XML External Entity Reference('XXE')
+			// SUPPRESS: CWE-611: Improper Restriction of XML External Entity Reference('XXE')
 			// https://cwe.mitre.org/data/definitions/611.html
 			var settings = new XmlReaderSettings();
 			settings.DtdProcessing = DtdProcessing.Ignore;

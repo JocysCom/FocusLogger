@@ -9,7 +9,8 @@
 
 .REMARKS
 
-    Requires Installation of InkScape from https://inkscape.org/release/
+    Requires Installation of InkScape 1.2 from https://inkscape.org/release/
+	https://inkscape.org/release/inkscape-1.2.2/windows/64-bit/compressed-7z/dl/
 
 	How to include icons resource into App.xaml file:
 
