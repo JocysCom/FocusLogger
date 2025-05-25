@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace JocysCom.ClassLibrary.Collections
@@ -7,8 +8,19 @@ namespace JocysCom.ClassLibrary.Collections
 	{
 
 		/// <summary>
-		/// Synchronize source collection to destination.
+		/// Synchronizes target list to match source list:
+		/// removes items not in source, inserts missing items,
+		/// and reorders existing elements to mirror source order.
 		/// </summary>
+		/// <typeparam name="T">Type of elements in the lists.</typeparam>
+		/// <param name="source">The source list whose items and order to mirror; must not be null.</param>
+		/// <param name="target">The target list to update; must support Insert and RemoveAt; must not be null.</param>
+		/// <param name="comparer">Optional equality comparer; defaults to <see cref="EqualityComparer{T}.Default"/>.</param>
+		/// <remarks>
+		/// Uses a <see cref="Dictionary{T,int}"/> for fast source lookups; overall time complexity is O(n^2) due to list insert/remove operations.
+		/// Try to use quick sort algorithm by using uniqueSortName/index.
+		/// When target is <see cref="ObservableCollection{T}"/>, uses <see cref="ObservableCollection{T}.Move(int, int)"/> to avoid triggering remove and insert events.
+		/// </remarks>
 		public static void Synchronize<T>(IList<T> source, IList<T> target, IEqualityComparer<T> comparer = null)
 		{
 			comparer = comparer ?? EqualityComparer<T>.Default;
@@ -43,9 +55,21 @@ namespace JocysCom.ClassLibrary.Collections
 				}
 				if (ti != si)
 				{
-					T temp = target[si];
-					target[si] = target[ti];
-					target[ti] = temp;
+					var oc = target as ObservableCollection<T>;
+					// If observable collection then
+					if (oc != null)
+					{
+						// Move item without triggering remove and insert events.
+						oc.Move(si, ti);
+					}
+					else
+					{
+						// Removes and inserts item and
+						// can disrupt data binding in WPF controls.
+						var item = target[ti];
+						target.RemoveAt(ti);
+						target.Insert(si, item);
+					}
 				}
 			}
 			// Remove items at the end of target that exceed source's length

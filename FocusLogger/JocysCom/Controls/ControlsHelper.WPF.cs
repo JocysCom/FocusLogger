@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
-using System.Linq;
-using System.ComponentModel;
-using System.Windows.Controls;
-using System;
-using System.Windows.Media;
-using System.IO;
-using System.Windows.Documents;
+﻿using System;
 using System.Collections.Generic;
-using System.Xml;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Xml;
 
 namespace JocysCom.ClassLibrary.Controls
 {
@@ -83,13 +84,23 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			if (control is null)
 				throw new ArgumentNullException(nameof(control));
-			var text = (args is null)
-				? format
-				: string.Format(format, args);
+			var text = args?.Count() > 0
+				? string.Format(format ?? "", args)
+				: format;
 			if (control.Content as string != text)
 				control.Content = text;
 		}
 
+		public static void SetText(PasswordBox control, string format, params object[] args)
+		{
+			if (control is null)
+				throw new ArgumentNullException(nameof(control));
+			var text = args?.Count() > 0
+				? string.Format(format ?? "", args)
+				: format;
+			if (control.Password != text)
+				control.Password = text;
+		}
 
 		/// <summary>
 		/// Change value if it is different only.
@@ -99,9 +110,9 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			if (control is null)
 				throw new ArgumentNullException(nameof(control));
-			var text = (args is null)
-				? format
-				: string.Format(format, args);
+			var text = args?.Count() > 0
+				? string.Format(format ?? "", args)
+				: format;
 			if (control.Header as string != text)
 				control.Header = text;
 		}
@@ -114,9 +125,9 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			if (control is null)
 				throw new ArgumentNullException(nameof(control));
-			var text = (args is null)
-				? format ?? ""
-				: string.Format(format ?? "", args);
+			var text = args?.Count() > 0
+				? string.Format(format ?? "", args)
+				: format;
 			if (control.Text != text)
 				control.Text = text;
 		}
@@ -129,9 +140,9 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			if (control is null)
 				throw new ArgumentNullException(nameof(control));
-			var text = (args is null)
-				? format ?? ""
-				: string.Format(format ?? "", args);
+			var text = args?.Count() > 0
+				? string.Format(format ?? "", args)
+				: format;
 			if (control.Text != text)
 				control.Text = text;
 		}
@@ -181,6 +192,27 @@ namespace JocysCom.ClassLibrary.Controls
 			if (control.Visibility != visibility)
 				control.Visibility = visibility;
 		}
+
+
+		public static void SetItemsSource(DataGridComboBoxColumn grid, IBindingList list)
+		{
+			if (list is null)
+			{
+				if (grid.ItemsSource is System.Windows.Data.BindingListCollectionView view)
+				{
+					grid.ItemsSource = null;
+					view.DetachFromSourceCollection();
+				}
+				return;
+			}
+			var currentView = (System.Windows.Data.BindingListCollectionView)grid.ItemsSource;
+			// If same list then...
+			if (currentView?.SourceCollection == list)
+				return;
+			var newView = new System.Windows.Data.BindingListCollectionView(list);
+			grid.ItemsSource = newView;
+		}
+
 
 		public static void SetItemsSource(ItemsControl grid, IBindingList list)
 		{
@@ -322,6 +354,37 @@ namespace JocysCom.ClassLibrary.Controls
 			WeakEventManager<Window, CancelEventArgs>.AddHandler(w, nameof(Window.Closing), handler);
 		}
 
+		public static void RemoveFromParent(FrameworkElement element)
+		{
+			if (element == null)
+				return;
+			var lParent = LogicalTreeHelper.GetParent(element);
+			var vParent = VisualTreeHelper.GetParent(element);
+
+			if (vParent is ItemsControl items)
+				items.Items.Remove(element);
+			if (vParent is StackPanel panel)
+				panel.Children.Remove(element);
+			if (vParent is Panel grid)
+				grid.Children.Remove(element);
+			if (vParent is ContentPresenter window)
+				window.Content = null;
+			if (vParent is Decorator border)
+				border.Child = null;
+			// Remove visual and logical children.
+			var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+			if (vParent is FrameworkElement)
+			{
+				var methodInfo = vParent.GetType().GetMethod("RemoveVisualChild", flags);
+				methodInfo.Invoke(vParent, new object[] { element });
+			}
+			if (lParent is FrameworkElement)
+			{
+				var methodInfo = lParent.GetType().GetMethod("RemoveLogicalChild", flags);
+				methodInfo.Invoke(lParent, new object[] { element });
+			}
+		}
+
 		/// <summary>
 		/// Get all child controls with path.
 		/// Use regex to make shorter tabbed path:
@@ -404,7 +467,7 @@ namespace JocysCom.ClassLibrary.Controls
 		/// <summary>
 		/// Get all child controls.
 		/// </summary>
-		public static T[] GetAll<T>(Control control, bool includeTop = false)
+		public static T[] GetAll<T>(FrameworkElement control, bool includeTop = false)
 		{
 			if (control is null)
 				return new T[0];
@@ -636,13 +699,15 @@ namespace JocysCom.ClassLibrary.Controls
 			return list;
 		}
 
-		[Obsolete]
+		[Obsolete("Use `bool SetSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, int selectIndex = 0) instead.`")]
 		public static void RestoreSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, bool selectFirst = true)
-		{
-			RestoreSelection(grid, keyPropertyName, list, selectFirst ? 0 : -1);
-		}
+			=> SetSelection(grid, keyPropertyName, list, selectFirst ? 0 : -1);
 
-		public static bool RestoreSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, int selectIndex = 0)
+		[Obsolete("Use `bool SetSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, int selectIndex = 0)` instead.")]
+		public static void RestoreSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, int selectIndex = 0)
+			=> SetSelection(grid, keyPropertyName, list, selectIndex);
+
+		public static bool SetSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, int selectIndex = 0)
 		{
 			if (grid is null)
 				throw new ArgumentNullException(nameof(grid));
@@ -685,7 +750,7 @@ namespace JocysCom.ClassLibrary.Controls
 
 		#endregion
 
-		#region TextBoxBase
+		#region TextBoxBase - EnableAutoScroll
 
 		public static VerticalAlignment GetScrollVerticalAlignment(ScrollViewer control)
 		{
@@ -695,7 +760,6 @@ namespace JocysCom.ClassLibrary.Controls
 			var height = control.ExtentHeight;
 			// Vertical size of the visible content area.
 			var visibleView = control.ViewportHeight;
-			//var scrollBarHeight = control.ActualHeight - control.ViewportHeight;
 			// Allow flexibility of 2 pixels.
 			var flex = 2;
 			if (height - offset - visibleView < flex)
@@ -716,11 +780,6 @@ namespace JocysCom.ClassLibrary.Controls
 					.Where(x => x.ComputedVerticalScrollBarVisibility == Visibility.Visible)
 					.FirstOrDefault() ?? all.FirstOrDefault();
 			}
-			//if (control is TextBoxBase tb)
-			//{
-			//	var border = (Border)VisualTreeHelper.GetChild(control, 0);
-			//	sv = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
-			//}
 			if (sv != null)
 			{
 				var scrollPosition = GetScrollVerticalAlignment(sv);
@@ -728,14 +787,6 @@ namespace JocysCom.ClassLibrary.Controls
 					sv.ScrollToEnd();
 			}
 		}
-
-		//public static void Measure(Control control)
-		//{
-		//	var available = LayoutInformation.GetLayoutSlot(control);
-		//	Size s = new Size(available.Width, available.Height);
-		//	control.Measure(s);
-		//	control.Arrange(available);
-		//}
 
 		public static void EnableAutoScroll(TextBoxBase control, bool enable = true)
 		{
@@ -760,6 +811,76 @@ namespace JocysCom.ClassLibrary.Controls
 			=> AutoScroll((TextBox)sender);
 
 		#endregion
+
+		#region TextBoxBase - AppendText - Logging
+
+		public static void AppendText(TextBox control, string text, int maxSize = 65535)
+		{
+			// Check for a null control
+			if (control == null) throw new ArgumentNullException(nameof(control));
+
+			// Invoke UI thread if necessary, to perform UI updates
+			AppInvoke(() =>
+			{
+				// Calculate new text size
+				var newTextSize = System.Text.Encoding.UTF8.GetByteCount(control.Text + text);
+				// Ensure the final text size does not exceed maxSize
+				if (newTextSize > maxSize)
+				{
+					var lines = control.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+					int linesToRemove = 0;
+					int sizeRemoved = 0;
+
+					// Determine how many lines to remove from the start to stay within maxSize
+					while (sizeRemoved < newTextSize - maxSize && linesToRemove < lines.Length)
+					{
+						sizeRemoved += System.Text.Encoding.UTF8.GetByteCount(lines[linesToRemove] + Environment.NewLine);
+						linesToRemove++;
+					}
+					// Rebuild the remaining text after removing oldest lines
+					var remainingText = string.Join(Environment.NewLine, lines, linesToRemove, lines.Length - linesToRemove);
+					control.Text = remainingText;
+				}
+				// Append the new text
+				if (control.Text.Length > 0)
+					control.AppendText(Environment.NewLine + text);
+				else
+					control.AppendText(text);
+			});
+		}
+
+		#endregion
+
+		public static void AppInvoke(Action action)
+		{
+			// Check if we are on the UI thread
+			if (Application.Current.Dispatcher.CheckAccess())
+			{
+				// If on UI thread, update the UI elements directly
+				action.Invoke();
+			}
+			else
+			{
+				// If not on UI thread, invoke on the UI thread
+				Application.Current.Dispatcher.Invoke(action);
+			}
+		}
+
+		public static void AppBeginInvoke(Action action)
+		{
+			// Check if we are on the UI thread
+			if (Application.Current.Dispatcher.CheckAccess())
+			{
+				// If on UI thread, update the UI elements directly
+				//_ = action.BeginInvoke(action.EndInvoke, null);
+				Application.Current.Dispatcher.BeginInvoke(action);
+			}
+			else
+			{
+				// If not on UI thread, invoke on the UI thread
+				Application.Current.Dispatcher.BeginInvoke(action);
+			}
+		}
 
 		// Contains unique list of control IDs for the applicaiton.
 		private static SortedSet<int> LoadedControls = new SortedSet<int>();
@@ -804,6 +925,130 @@ namespace JocysCom.ClassLibrary.Controls
 				return false;
 			var code = control.GetHashCode();
 			return LoadedControls.Contains(code);
+		}
+
+		#region File Explorer Behaviour
+
+		/*
+		Behavior:
+
+		1. Selecting a row by clicking on the row (excluding the checkbox) should select the row and check its box.
+		2. Deselecting a row by clicking on the selected row (excluding the checkbox) should deselect the row and uncheck its box.
+		3. Checking the box should only affect its associated row, selecting it. All other rows and checkboxes should remain unaffected.
+		4. Unchecking the box should only deselect its associated row. All other rows and checkboxes should remain unaffected.
+
+		In summary, both selection and multi-selection operate normally and mirrored on checkboxes.
+		Checking or unchecking a box affects the selection of its associated row only.
+		
+
+		<!--  Used for File Explorer selection behaviour  -->
+		<DataGridTemplateColumn x:Name="IsCheckedColumn" Width="Auto" CanUserSort="False">
+			<DataGridTemplateColumn.CellTemplate>
+				<DataTemplate>
+					<CheckBox x:Name="IsCheckedCheckBox" IsChecked="{Binding IsSelected, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridRow}}" PreviewMouseDown="CheckBox_PreviewMouseDown" />
+				</DataTemplate>
+			</DataGridTemplateColumn.CellTemplate>
+			<DataGridTemplateColumn.Header>
+				<CheckBox
+					x:Name="IsCheckedColumnCheckBox"
+					Margin="0"
+					Padding="0"
+					IsEnabled="False" />
+			</DataGridTemplateColumn.Header>
+		</DataGridTemplateColumn>
+		 
+		 */
+
+		static T GetParent<T>(DependencyObject source) where T : class
+		{
+			while (source != null && !(source is T))
+				source = VisualTreeHelper.GetParent(source);
+			return source as T;
+		}
+
+		/// <summary>
+		/// Workaround: Without this event, "mouse down" will select the checkbox, but "mouse up" will deselect it immediately.
+		/// </summary>
+		public static void FileExplorer_DataGrid_CheckBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			var checkBox = (CheckBox)sender;
+			var dataGridRow = GetParent<DataGridRow>((DependencyObject)e.OriginalSource);
+			if (dataGridRow != null)
+			{
+				dataGridRow.IsSelected = !(checkBox.IsChecked == true);
+				e.Handled = true;
+			}
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Checks if the specified control within its parent TabControls is selected.
+		/// </summary>
+		/// <param name="control">The control to check for selection.</param>
+		/// <returns>True if the TabItem is selected, otherwise false.</returns>
+		/// <summary>
+		/// Checks if the specified control within its parent TabControls is selected.
+		/// </summary>
+		/// <param name="control">The control to check for selection.</param>
+		/// <returns>True if the TabItem is selected, otherwise false.</returns>
+		public static bool IsTabItemSelected(FrameworkElement control)
+		{
+			var parent = control.Parent as FrameworkElement;
+			while (parent != null)
+			{
+				if (parent is TabItem tabItem)
+				{
+					if (!tabItem.IsSelected)
+						return false;
+				}
+				else if (parent is TabControl tabControl)
+				{
+					foreach (TabItem item in tabControl.Items)
+					{
+						if (item.Content == control)
+						{
+							if (!item.IsSelected)
+								return false;
+							break;
+						}
+					}
+				}
+				parent = parent.Parent as FrameworkElement;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Ensures that the specified control is selected within its parent TabControls.
+		/// </summary>
+		/// <param name="control">The control to be selected.</param>
+		public static void EnsureTabItemSelected(FrameworkElement control)
+		{
+			if (IsTabItemSelected(control))
+				return;
+			var parent = control.Parent as FrameworkElement;
+			while (parent != null)
+			{
+				if (parent is TabItem tabItem)
+				{
+					if (!tabItem.IsSelected)
+						tabItem.IsSelected = true;
+				}
+				else if (parent is TabControl tabControl)
+				{
+					foreach (TabItem item in tabControl.Items)
+					{
+						if (item.Content == control)
+						{
+							if (!item.IsSelected)
+								item.IsSelected = true;
+							break;
+						}
+					}
+				}
+				parent = parent.Parent as FrameworkElement;
+			}
 		}
 
 	}

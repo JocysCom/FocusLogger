@@ -12,7 +12,7 @@
 
     Original (maintaned by the owner)       Copies
     ---------------------------------       -----------------------------------------
-    \Projects\Jocys.com\Class Library       \Projects\Company A\Product A\Jocys.com
+    \Projects\Jocys.com\Class Library\Core   \Projects\Company A\Product A\Jocys.com
         [linked file] <-----------------------> [linked file]
                                           |     MakeLinks.ps1    
                                           |
@@ -143,7 +143,7 @@ function MakeHardLink {
 # ----------------------------------------------------------------------------
 # Execute
 # ----------------------------------------------------------------------------
-$libraryPath = FindExistingPath @("c:\Projects\Jocys.com\Class Library", "d:\Projects\Jocys.com\Class Library");
+$libraryPath = FindExistingPath @("c:\Projects\Jocys.com\ClassLibrary\Core", "d:\Projects\Jocys.com\ClassLibrary\Core");
 if ($null -eq $libraryPath){
     Write-Host "Library Path: Not Found!";
     return;
