@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace JocysCom.FocusLogger
 {
-	public class DataItem : ISettingsItem, INotifyPropertyChanged
+	public class DataItem : SettingsItem
 	{
 
 		public DateTime Date { get => _Date; set => SetProperty(ref _Date, value); }
@@ -50,33 +50,6 @@ namespace JocysCom.FocusLogger
 
 		public System.Windows.MessageBoxImage StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
 		System.Windows.MessageBoxImage _StatusCode;
-
-		#region ■ ISettingsItem
-
-		bool ISettingsItem.Enabled { get => IsEnabled; set => IsEnabled = value; }
-		private bool IsEnabled;
-
-		public bool IsEmpty =>
-			string.IsNullOrEmpty(ProcessName);
-
-		#endregion
-
-		#region ■ INotifyPropertyChanged
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
-
-		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
-
-		#endregion
 
 	}
 }

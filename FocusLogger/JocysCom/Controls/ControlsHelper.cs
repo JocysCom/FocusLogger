@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -311,7 +310,7 @@ namespace JocysCom.ClassLibrary.Controls
 		// Default cool-down 1 second.
 		public static TimeSpan ControlCooldown = new TimeSpan(0, 0, 1);
 
-		public static Dictionary<object, DateTime> ControlCooldowns { get; } = new Dictionary<object, DateTime>();
+		public static ConcurrentDictionary<int, DateTime> ControlCooldowns { get; } = new ConcurrentDictionary<int, DateTime>();
 
 		/// <summary>
 		/// Returns true if control is on cool-down.
@@ -321,40 +320,21 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			lock (ControlCooldowns)
 			{
-				var now = DateTime.Now;
-				// Get expired controls.
-				var keys = ControlCooldowns.Where(x => now > x.Value).Select(x => x.Key).ToList();
-				// Cleanup the list.
-				foreach (var key in keys)
-					ControlCooldowns.Remove(key);
+				var now = DateTime.UtcNow;
+				int hashCode = control.GetHashCode();
+				// Cleanup expired cooldowns.
+				var expiredKeys = ControlCooldowns.Where(kv => now > kv.Value).Select(kv => kv.Key).ToList();
+				foreach (var key in expiredKeys)
+					ControlCooldowns.TryRemove(key, out _);
 				// If on cool-down then...
-				if (ControlCooldowns.ContainsKey(control))
+				if (ControlCooldowns.ContainsKey(hashCode))
 					return true;
-				var cooldown = milliseconds.HasValue
-					? new TimeSpan(0, 0, 0, milliseconds.Value)
-					: ControlCooldown;
-				ControlCooldowns.Add(control, now.Add(cooldown));
+				var newTime = milliseconds.HasValue
+					? now.AddMilliseconds(milliseconds.Value)
+					: now.Add(ControlCooldown);
+				ControlCooldowns.TryAdd(hashCode, newTime);
 				return false;
 			}
-		}
-
-		#endregion
-
-		#region Enums
-
-		public static string GetStringFromValue<T>(this T value) where T : Enum
-		{
-			return Regex.Replace(value.ToString(), "(\\B[A-Z])", " $1");
-		}
-
-		public static Dictionary<T, string> GetDictionary<T>(T[] values = null) where T : Enum
-		{
-			if (values == null)
-				values = (T[])Enum.GetValues(typeof(T));
-			var dict = new Dictionary<T, string>();
-			foreach (var value in values)
-				dict[value] = value.GetStringFromValue();
-			return dict;
 		}
 
 		#endregion
