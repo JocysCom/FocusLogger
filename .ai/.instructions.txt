@@ -1,0 +1,14 @@
+# Custom instructions for GitHub Copilot
+
+Create a file that automatically adds information to all questions you ask GitHub Copilot Chat.
+
+With GitHub Copilot, you can receive chat responses tailored to your team'ss workflow, preferred tools, and project specifics - simply by providing context. Instead of adding this contextual detail to each chat query, you can create a file that supplies this information automatically. While this additional context won't appear in the chat, it is available to GitHub Copilot, allowing it to generate more accurate and relevant responses.
+
+## How to Enable Custom Instructions
+
+Enable the feature via Tools > Options > GitHub > Copilot > and check (Preview) Enable custom instructions to be loaded from .github/copilot-instructions.md files and added to requests.
+Add copilot-instruction.md in the root of your respository inside the .github file, create the file if it doesn't already exist.
+GitHub Copilot Enable Custom Instructions
+
+Learn more about creating custom instructions:
+https://docs.github.com/en/enterprise-cloud@latest/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot

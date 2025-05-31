@@ -1,0 +1,20 @@
+## User Instructions to create `repository-analysis.md`
+
+Explore the entire repository to understand the codebase from multiple angles: as a software architect, software developer and product manager. Compile your findings into a very extensive Markdown document in the `.ai` folder named `repository-analysis.instructions.md`. Include Mermaid diagrams for describing technical concepts.
+
+## Install the Mermaid preview plug-in
+
+	1. Open Extensions (Ctrl + Shift + X).
+	2. Search: Markdown Preview Mermaid Support (publisher: Matt Bierner).
+	3. Click Install – or hit Ctrl + P.
+	
+## Open Preview
+
+	1. Open the menu on the tab header of the file.
+	2. Click "Open Preview" – or hit Ctrl + Shift + V.
+	
+## Re Open Preview
+
+	1. Open the menu on the tab header of the file.
+	2. Click "Reopen Editor With..."
+	3. Click "Markdown Preview (Built-In)"
