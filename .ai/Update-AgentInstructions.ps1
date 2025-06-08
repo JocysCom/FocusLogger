@@ -1,7 +1,7 @@
 # Script: Update-AgentInstructions.ps1
 # Location: .ai/Update-AgentInstructions.ps1
 # Description: Updates AI agent instruction files from master copies in the .ai folder,
-#              processing only files matching '*.instructions.md'.
+#              processing only files matching '*instructions.md'.
 
 # Strict mode
 Set-StrictMode -Version Latest
@@ -56,10 +56,10 @@ try {
     $scriptDir = $PSScriptRoot # Directory where the script itself is located (.ai)
     $repoRoot = Join-Path -Path $scriptDir -ChildPath ".." | Resolve-Path # Absolute path to the repository root
 
-    # Discover source files matching *.instructions.md in the .ai folder
-    $sourceInstructionFiles = Get-ChildItem -Path $scriptDir -Filter "*.instructions.md" -File
+    # Discover source files matching *instructions.md in the .ai folder
+    $sourceInstructionFiles = Get-ChildItem -Path $scriptDir -Filter "*instructions.md" -File
     if ($null -eq $sourceInstructionFiles -or $sourceInstructionFiles.Count -eq 0) {
-        Write-Warning "No '*.instructions.md' files found in '$scriptDir'. Nothing to process."
+        Write-Warning "No '*instructions.md' files found in '$scriptDir'. Nothing to process."
         exit 0
     }
     Write-Host "Found the following source instruction files in '$scriptDir':"
@@ -73,7 +73,7 @@ try {
     
     $choices = [System.Management.Automation.Host.ChoiceDescription[]]@($choiceCline, $choiceCopilot, $choiceAll, $choiceCancel)
     $title = "Select Agent Instruction Set to Update"
-    $message = "Which agent's instructions do you want to update from the '*.instructions.md' files in '$scriptDir'?"
+    $message = "Which agent's instructions do you want to update from the '*instructions.md' files in '$scriptDir'?"
     
     $userChoiceResult = $Host.UI.PromptForChoice($title, $message, $choices, 0) # Default to CLINE (index 0)
 
@@ -145,3 +145,4 @@ try {
     # For more detailed error info, you might want to access $_.Exception.ToString()
     exit 1
 }
+pause
