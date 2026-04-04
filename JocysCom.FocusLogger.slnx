@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FocusLogger/JocysCom.FocusLogger.csproj" />
+  <Project Path="FocusLogger.Tests/JocysCom.FocusLogger.Tests.csproj" />
 </Solution>

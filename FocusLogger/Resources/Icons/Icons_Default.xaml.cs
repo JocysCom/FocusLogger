@@ -13,6 +13,7 @@ namespace JocysCom.FocusLogger.Resources.Icons
 		private static Icons_Default _Current;
 
 		public const string Icon_keyboard = nameof(Icon_keyboard);
+		public const string Icon_list = nameof(Icon_list);
 		public const string Icon_mouse2 = nameof(Icon_mouse2);
 		public const string Icon_text_field = nameof(Icon_text_field);
 		public const string Icon_window = nameof(Icon_window);
