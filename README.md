@@ -6,20 +6,20 @@ In game, mouse and keyboard could start temporary stop responding if other progr
 
 # Download
 
-Digitally Signed Application v1.1.14.0 (2023-08-26)
+Digitally Signed Application v1.2.6 (2026-04-04)
 
-[Download - JocysCom.FocusLogger.zip](https://github.com/JocysCom/FocusLogger/releases/download/1.1.14/JocysCom.FocusLogger.zip)
+[Download - JocysCom.FocusLogger.zip](https://github.com/JocysCom/FocusLogger/releases/download/1.2.6/JocysCom.FocusLogger.zip)
 
 # System Requirements
 
-- Microsoft Windows 7 SP1 or newer.
+- Microsoft Windows 10 or newer.
 
-  https://github.com/dotnet/core/blob/main/release-notes/6.0/supported-os.md
-- Microsoft .NET 6.0 (included with Windows Updates).
+  https://github.com/dotnet/core/blob/main/release-notes/8.0/supported-os.md
+- Microsoft .NET 8.0 (included with Windows Updates).
 
   https://dotnet.microsoft.com/download/dotnet
 
 ## Screenshots
 
-<img alt="Main From" src="FocusLogger/Documents/Images/JocysCom.FocusLogger.png" width="700" height="480">
+<img alt="Main From" src="Documents/Images/JocysCom.FocusLogger.png" width="700" height="480">
 
