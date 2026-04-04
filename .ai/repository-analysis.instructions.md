@@ -9,7 +9,7 @@ This document provides a factual reference for the Jocys.com FocusLogger reposit
 - **Repository:** https://github.com/JocysCom/FocusLogger
 - **License:** GNU General Public License v3.0
 - **Current version:** 1.2.6
-- **Target platform:** Windows 7 SP1+ with .NET 8.0
+- **Target platform:** Windows 10+ with .NET 8.0
 - **Primary audiences:** Gamers, power users, IT support personnel diagnosing focus-stealing issues.
 
 ## 2. Top-Level Structure
@@ -22,7 +22,7 @@ This section maps every top-level directory and file to help navigate the reposi
 | `FocusLogger.Tests/` | MSTest test project. Unit tests for CSV export and UI automation tests. |
 | `Documents/` | Release engineering: signing scripts, zip packaging scripts, screenshot tooling, and pre-built release files. |
 | `Resources/` | Solution-level shared scripts (currently `ZipFiles.ps1` for checksum-aware zip packaging). |
-| `.ai/` | AI agent instructions and repository analysis (this file). |
+| `.ai/` | AI agent instructions, coding guidelines, repository analysis, and skills. |
 | `JocysCom.FocusLogger.slnx` | Solution file (XML-based `.slnx` format) referencing the two projects. |
 | `README.md` | Project overview, download link, system requirements, screenshot. |
 | `LICENSE` | GPLv3 license text. |
@@ -211,6 +211,7 @@ dotnet test FocusLogger.Tests/JocysCom.FocusLogger.Tests.csproj
 | `Documents/App_2_Zip.ps1` | Packages the signed executable into a release ZIP. |
 | `Resources/ZipFiles.ps1` | Shared utility for checksum-aware ZIP creation (compares source/dest checksums before rebuilding). |
 | `Documents/Take_Screenshot.ps1` | Captures application screenshot for documentation. |
+| `Documents/Take_Screenshot.ps1.cs` | C# helper compiled by the screenshot script. |
 | `Solution_Cleanup.ps1` | Cleans `bin/`, `obj/`, and other build artifacts. |
 
 ### Icon workflow
@@ -230,17 +231,45 @@ This section identifies where documentation lives in the repository.
 | `README.md` | End users, contributors | Project overview, download link, system requirements, screenshot |
 | `SECURITY.md` | Security researchers | Vulnerability reporting policy |
 | `LICENSE` | All | GPLv3 full text |
-| `.ai/instructions.md` | AI agents | Coding style guidelines for AI-assisted edits |
+| `.ai/ReadMe.md` | AI agents, developers | Explains the purpose of each file in the `.ai/` directory and how custom instructions work for Copilot, CLINE, and Codex |
+| `.ai/instructions.md` | AI agents | Role definition and output formatting rules for AI-assisted edits |
+| `.ai/coding-guideline.instructions.md` | AI agents | Detailed coding guidelines, source control conventions (branch/PR naming), testing workflow, and constraints for AI agents |
 | `.ai/repository-analysis.instructions.md` | AI agents, developers | This file — comprehensive repository reference |
+| `.ai/skills/` | AI agents | Skill definitions (e.g., `ai-self-improvement`) for agent-assisted workflows |
 | `FocusLogger/Resources/AiAnalysisPrompt.md` | End users | Prompt template for users to paste into AI assistants alongside exported CSV logs |
 | `Documents/Images/` | README, users | Application screenshot |
 | `Settings.XamlStyler` | Developers | XamlStyler formatting configuration |
 
+### Documentation taxonomy
+
+```mermaid
+graph TD
+    subgraph EndUsers["End-User Documentation"]
+        README["README.md<br/>Overview, download, requirements"]
+        SECURITY["SECURITY.md<br/>Vulnerability reporting"]
+        LICENSE["LICENSE<br/>GPLv3"]
+        AiPrompt["FocusLogger/Resources/<br/>AiAnalysisPrompt.md<br/>Prompt template for CSV analysis"]
+        Screenshot["Documents/Images/<br/>Application screenshot"]
+    end
+
+    subgraph AIAgents["AI Agent Instructions"]
+        AiReadMe[".ai/ReadMe.md<br/>Directory guide"]
+        AiInstr[".ai/instructions.md<br/>Role & output rules"]
+        AiCoding[".ai/coding-guideline<br/>.instructions.md<br/>Coding & SCM conventions"]
+        AiRepo[".ai/repository-analysis<br/>.instructions.md<br/>This file"]
+        AiSkills[".ai/skills/<br/>Agent skill definitions"]
+    end
+
+    subgraph DevConfig["Developer Configuration"]
+        XamlStyler["Settings.XamlStyler<br/>XAML formatting"]
+    end
+```
+
 ## 9. AI-Agent-Relevant Conventions and Constraints
 
-This section captures rules and patterns that materially affect automated edits.
+This section captures rules and patterns that materially affect automated edits. The full set of coding and source-control conventions is defined in `.ai/coding-guideline.instructions.md`; the highlights below are the items most likely to cause mistakes if overlooked.
 
-1. **Coding style:** Follow Microsoft C# conventions. PascalCase for public members, camelCase for locals. Some private fields use `_PascalCase` (e.g., `_Date`). Preserve existing naming patterns in each file.
+1. **Coding style:** Follow Microsoft C# conventions. PascalCase for public members, camelCase for locals. Some private fields use `_PascalCase` (e.g., `_Date`). Preserve existing naming patterns in each file. Prefer the simplest viable solution; avoid over-engineering.
 
 2. **Doc comments:** Per `.ai/instructions.md`, convert simple comments to XML documentation comments where beneficial for IntelliSense. Do not alter surrounding code when doing so.
 
@@ -259,3 +288,15 @@ This section captures rules and patterns that materially affect automated edits.
 9. **Solution format:** Uses `.slnx` (XML-based solution format), not the older `.sln` text format.
 
 10. **No CI/CD pipelines:** All build and release steps are manual/local. Scripts in `Documents/` handle signing and packaging.
+
+11. **File size limit:** No code file that is created or modified may exceed 6000 tokens (~24 KB).
+
+12. **Source control conventions:** Issues use `{CATEGORY}: {Description}` (FEAT, FIX, TECH, DOCS). Branches use `{CATEGORY}-{issue#}-{lowercase-dashed-name}`. PRs use `PR: #{issue#}: {CATEGORY}: {Description}` and must reference the issue with `Closes #{issue#}`. Merge via PR only — no direct pushes to `main`.
+
+13. **No Co-Authored-By lines:** Do not add `Co-Authored-By` AI model/company lines to commits.
+
+14. **Issue closure:** Never close issues before a release is published with the fix.
+
+15. **No duplication / SSOT:** Update or move existing code instead of adding parallel implementations. If introducing a replacement, remove the old one in the same change.
+
+16. **Stability primitives:** When the repo provides an established script or command, use it verbatim. Only deviate when it is proven broken, and then fix the primitive rather than inventing a parallel path.
