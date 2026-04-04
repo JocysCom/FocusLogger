@@ -584,9 +584,8 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// its type T equivalent. A return value indicates whether the conversion
 		/// succeeded or failed.
 		/// </summary>
-		/// <typeparam name="T">The type to try and convert to.</typeparam>
 		/// <param name="value">A string containing the value to try and convert.</param>
-		/// <param name="type">target type</param>
+		/// <param name="t">target type</param>
 		/// <param name="result">If the conversion was successful, the converted value of type T.</param>
 		/// <returns>If value was converted successfully, true; otherwise false.</returns>
 		public static bool TryParse(object value, Type t, out object result)

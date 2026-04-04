@@ -98,7 +98,7 @@ namespace JocysCom.ClassLibrary.Controls
 		/// if maxLength == -1, return string.Empty
 		/// if maxLength == 0 return s
 		/// </summary>
-		/// <param name="s"></param>
+		/// <param name="so"></param>
 		/// <param name="maxLength"></param>
 		/// <returns></returns>
 		public static string CropText(object so, int? maxLength = 0)

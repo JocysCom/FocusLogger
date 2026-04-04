@@ -173,6 +173,7 @@ namespace JocysCom.ClassLibrary.Controls
 		/// <summary>
 		/// Change value if it is different only.
 		/// This helps not to trigger control events when doing frequent events.
+		/// </summary>
 		public static void SetEnabled(UIElement control, bool enabled)
 		{
 			if (control is null)
@@ -184,6 +185,7 @@ namespace JocysCom.ClassLibrary.Controls
 		/// <summary>
 		/// Change value if it is different only.
 		/// This helps not to trigger control events when doing frequent events.
+		/// </summary>
 		public static void SetVisible(UIElement control, bool enabled)
 		{
 			if (control is null)
@@ -488,7 +490,10 @@ namespace JocysCom.ClassLibrary.Controls
 			var container = control as DependencyObject;
 			while (container != null)
 			{
-				control = System.Windows.Input.FocusManager.GetFocusedElement(control) as FrameworkElement;
+				Invoke(() =>
+				{
+					control = System.Windows.Input.FocusManager.GetFocusedElement(control) as FrameworkElement;
+				});
 				if (control is null)
 					break;
 				Invoke(() =>
@@ -677,7 +682,7 @@ namespace JocysCom.ClassLibrary.Controls
 		/// </summary>
 		/// <typeparam name="T">Type of Primary key.</typeparam>
 		/// <param name="grid">Grid for getting selection</param>
-		/// <param name="primaryKeyPropertyName">Primary key name.</param>
+		/// <param name="keyPropertyName">Primary key name.</param>
 		public static List<T> GetSelection<T>(DataGrid grid, string keyPropertyName = null)
 		{
 			if (grid is null)
@@ -982,11 +987,6 @@ namespace JocysCom.ClassLibrary.Controls
 
 		#endregion
 
-		/// <summary>
-		/// Checks if the specified control within its parent TabControls is selected.
-		/// </summary>
-		/// <param name="control">The control to check for selection.</param>
-		/// <returns>True if the TabItem is selected, otherwise false.</returns>
 		/// <summary>
 		/// Checks if the specified control within its parent TabControls is selected.
 		/// </summary>

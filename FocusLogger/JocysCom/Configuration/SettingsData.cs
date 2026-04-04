@@ -990,8 +990,6 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// Enables or disables monitoring on the settings file directory. When enabled, changes to the files are detected, allowing for the application to respond accordingly.
 		/// </summary>
 		/// <param name="enabled">true to enable monitoring; false to disable it.</param>
-		/// <param name="folderPath">The path to the folder to monitor.</param>
-		/// <param name="filePattern">The pattern of the file names to monitor within the folder.</param>
 		public void SetFileMonitoring(bool enabled)
 		{
 			// Allow to monitor if items are in separate files.
@@ -1017,6 +1015,8 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// Enables or disables file monitoring for changes to settings files. When enabled, changes to the settings file on disk will trigger a reload of settings to reflect the new state.
 		/// </summary>
 		/// <param name="enabled">Indicates whether file monitoring should be enabled (true) or disabled (false).</param>
+		/// <param name="folderPath">The path to the folder to monitor.</param>
+		/// <param name="filePattern">The pattern of the file names to monitor within the folder.</param>
 		/// <remarks>
 		/// Monitoring settings files is crucial in scenarios where settings might be changed externally or by different instances, ensuring the application operates with the most up-to-date configuration.
 		/// </remarks>

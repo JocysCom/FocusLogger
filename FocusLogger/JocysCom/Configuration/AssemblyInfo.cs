@@ -315,7 +315,12 @@ namespace JocysCom.ClassLibrary.Configuration
 			try
 			{
 				s = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-				_ = s.Read(b, 0, 2048);
+				var bytesToRead = (int)Math.Min(s.Length, b.Length);
+#if NET7_0_OR_GREATER
+				s.ReadExactly(b, 0, bytesToRead);
+#else
+				s.Read(b, 0, bytesToRead);
+#endif
 			}
 			finally
 			{
@@ -337,7 +342,7 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// 
 		/// Option 1: Disable Deterministic build by adding
 		/// 
-		///      &gt;Deterministic&lt;False&gt;/Deterministic&lt; inside a &gt;PropertyGroup&lt section  of .csproj
+		///      &lt;Deterministic&gt;False&lt;/Deterministic&gt; inside a &lt;PropertyGroup&gt; section of .csproj
 		///
 		/// Option 2:
 		/// 

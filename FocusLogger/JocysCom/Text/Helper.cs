@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -226,23 +226,64 @@ namespace JocysCom.ClassLibrary.Text
 		/// <summary>
 		/// Convert string value to an escaped C# string literal.
 		/// </summary>
-		public static string ToLiteral(string input, string language = "JScript")
+		public static string ToLiteral(string input)
 		{
-			using (var writer = new StringWriter())
+			return FormatLiteral(input, quote: true);
+		}
+
+		/// <summary>Return a C# string literal (optionally quoted) that represents <paramref name="value"/>.</summary>
+		private static string FormatLiteral(string value, bool quote)
+		{
+			if (value is null) return "null";
+
+			var sb = new StringBuilder(value.Length + 2);
+			if (quote) sb.Append('"');
+
+			for (int i = 0; i < value.Length; i++)
 			{
-				using (var provider = System.CodeDom.Compiler.CodeDomProvider.CreateProvider(language))
+				char c = value[i];
+				switch (c)
 				{
-					var exp = new System.CodeDom.CodePrimitiveExpression(input);
-					System.CodeDom.Compiler.CodeGeneratorOptions options = null;
-					provider.GenerateCodeFromExpression(exp, writer, options);
-					var literal = writer.ToString();
-					var rxLines = new Regex("\"\\s*[+]\\s*[\r\n]\"", RegexOptions.Multiline);
-					literal = rxLines.Replace(literal, "");
-					//literal = literal.Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
-					//literal = literal.Replace("\\r\\n", "\\r\\n\"+\r\n\"");
-					return literal;
+					case '\"': sb.Append("\\\""); break; // quote
+					case '\\': sb.Append("\\\\"); break; // backslash
+					case '\0': sb.Append("\\0"); break;
+					case '\a': sb.Append("\\a"); break;
+					case '\b': sb.Append("\\b"); break;
+					case '\f': sb.Append("\\f"); break;
+					case '\n': sb.Append("\\n"); break;
+					case '\r': sb.Append("\\r"); break;
+					case '\t': sb.Append("\\t"); break;
+					case '\v': sb.Append("\\v"); break;
+
+					default:
+						// Line/para separators & NEL must be escaped in C# source, and any control chars.
+						if (char.IsControl(c) || c == '\u0085' || c == '\u2028' || c == '\u2029')
+						{
+							sb.Append("\\u").Append(((int)c).ToString("x4"));
+						}
+						else if (char.IsSurrogate(c))
+						{
+							// If it's a valid surrogate pair, keep it as-is (e.g., emoji).
+							if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+							{
+								sb.Append(c).Append(value[++i]);
+							}
+							else
+							{
+								// Unpaired surrogate — escape it.
+								sb.Append("\\u").Append(((int)c).ToString("x4"));
+							}
+						}
+						else
+						{
+							sb.Append(c);
+						}
+						break;
 				}
 			}
+			if (quote)
+				sb.Append('"');
+			return sb.ToString();
 		}
 
 		#region Word Wrap

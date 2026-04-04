@@ -116,7 +116,8 @@ namespace JocysCom.ClassLibrary.Controls
 		}
 
 		/// <summary>Executes the specified action delegate asynchronously on main User Interface (UI) Thread.</summary>
-		/// <param name="action">The action delegate to execute asynchronously.</param>
+		/// <param name="method">The delegate to execute asynchronously.</param>
+		/// <param name="args">The arguments to pass to the delegate.</param>
 		/// <returns>The started System.Threading.Tasks.Task.</returns>
 		public static Task BeginInvoke(Delegate method, params object[] args)
 		{
@@ -144,7 +145,8 @@ namespace JocysCom.ClassLibrary.Controls
 		}
 
 		/// <summary>Executes the specified action delegate synchronously on main Graphical User Interface (GUI) Thread.</summary>
-		/// <param name="action">The delegate to execute synchronously.</param>
+		/// <param name="method">The delegate to execute synchronously.</param>
+		/// <param name="args">The arguments to pass to the delegate.</param>
 		public static object Invoke(Delegate method, params object[] args)
 		{
 			if (method is null)
