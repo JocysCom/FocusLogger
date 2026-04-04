@@ -57,6 +57,7 @@ Naming conventions for issues, branches, and pull requests.
 - Feature branches are always created from `main` or `master`. Never merge one feature branch into another — only merge `main` if you need to catch up.
 - Always create branches from latest origin/main or origin/main, never merge sub-branches, confirm before risky git ops.
 - Do not add Co-Authored-By {AI model}/{AI company} lines to commits.
+- Never close issues before a release is published with the fix.
 
 Use the following guidelines:
 

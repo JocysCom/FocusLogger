@@ -23,6 +23,9 @@ namespace JocysCom.FocusLogger
 		public string WindowTitle { get => _WindowTitle; set => SetProperty(ref _WindowTitle, value); }
 		string _WindowTitle;
 
+		public string WindowClassName { get => _WindowClassName; set => SetProperty(ref _WindowClassName, value); }
+		string _WindowClassName;
+
 		public bool HasMouse { get => _HasMouse; set => SetProperty(ref _HasMouse, value); }
 		bool _HasMouse;
 
