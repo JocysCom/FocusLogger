@@ -123,7 +123,8 @@ namespace JocysCom.ClassLibrary.IO
 		/// Important: if relative is directory then path must end with '\' or '/'.
 		/// </summary>
 		/// <param name="relativeTo"></param>
-		/// <param name="pathTo"></param>
+		/// <param name="path"></param>
+		/// <param name="addCurrentDir"></param>
 		/// <returns></returns>
 		public static string GetRelativePath(string relativeTo, string path, bool addCurrentDir = true)
 		{

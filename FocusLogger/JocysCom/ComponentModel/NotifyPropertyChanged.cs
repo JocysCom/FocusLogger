@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using System.Threading;
 
 namespace JocysCom.ClassLibrary.ComponentModel
 {
@@ -15,6 +15,8 @@ namespace JocysCom.ClassLibrary.ComponentModel
 	{
 
 		#region ■ INotifyPropertyChanged
+
+		private readonly SynchronizationContext _ctx = SynchronizationContext.Current ?? new SynchronizationContext();
 
 		/// <summary>
 		/// Notifies clients that a property value has changed.
@@ -32,13 +34,13 @@ namespace JocysCom.ClassLibrary.ComponentModel
 		{
 			if (UseApplicationDispatcher)
 			{
-				var dispatcher = Application.Current.Dispatcher;
-				if (dispatcher.CheckAccess())
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-				else
-					Application.Current.Dispatcher.Invoke(() =>
-						PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-				return;
+				// If already on different thread then...
+				if (SynchronizationContext.Current != _ctx)
+				{
+					void RaiseCore() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+					_ctx.Post(_ => RaiseCore(), null);
+					return;
+				}
 			}
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}

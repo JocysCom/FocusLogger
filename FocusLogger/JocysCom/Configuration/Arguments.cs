@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace JocysCom.ClassLibrary.Configuration
 {
     /// <summary>
-    /// Represents a case-insensitive command-line arguments parser built on Dictionary<string,string>.
+    /// Represents a case-insensitive command-line arguments parser built on Dictionary&lt;string,string&gt;.
     /// Splits parameters by -, --, /, =, or :, and removes enclosing quotes from values.
     /// </summary>
     /// <remarks>

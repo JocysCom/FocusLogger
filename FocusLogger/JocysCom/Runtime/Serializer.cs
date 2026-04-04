@@ -383,7 +383,9 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// </summary>
 		/// <param name="o">The object to serialize.</param>
 		/// <param name="encoding">The encoding to use (default is UTF8).</param>
-		/// <param name="namespaces">Contains the XML namespaces and prefixes that the XmlSerializer  uses to generate qualified names in an XML-document instance.</param>
+		/// <param name="omitXmlDeclaration">Whether to omit the XML declaration.</param>
+		/// <param name="comment">Optional comment to include in the XML.</param>
+		/// <param name="indent">Whether to indent the XML output.</param>
 		/// <returns>XML string.</returns>
 		public static string SerializeToXmlString(object o, Encoding encoding = null, bool omitXmlDeclaration = false, string comment = null, bool indent = true)
 		{
@@ -396,6 +398,10 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// <param name="o">The object to serialize.</param>
 		/// <param name="path">The file name to write to.</param>
 		/// <param name="encoding">The encoding to use (default is UTF8).</param>
+		/// <param name="omitXmlDeclaration">Whether to omit the XML declaration.</param>
+		/// <param name="comment">Optional comment to include in the XML.</param>
+		/// <param name="attempts">Number of attempts to write the file.</param>
+		/// <param name="waitTime">Wait time between attempts in milliseconds.</param>
 		public static void SerializeToXmlFile(object o, string path, Encoding encoding = null, bool omitXmlDeclaration = false, string comment = null, int attempts = 2, int waitTime = 500)
 		{
 			var bytes = (o is null)
@@ -409,8 +415,10 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// Serialize object to XML bytes with Byte Order Mark (BOM).
 		/// </summary>
 		/// <param name="o">The object to serialize.</param>
-		/// <param name="path">The file name to write to.</param>
 		/// <param name="encoding">The encoding to use (default is UTF8).</param>
+		/// <param name="omitXmlDeclaration">Whether to omit the XML declaration.</param>
+		/// <param name="comment">Optional comment to include in the XML.</param>
+		/// <returns>XML bytes with Byte Order Mark (BOM).</returns>
 		public static byte[] SerializeToXmlBytes(object o, Encoding encoding = null, bool omitXmlDeclaration = false, string comment = null)
 		{
 			var bytes = (o is null)
@@ -439,7 +447,7 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// <summary>
 		/// De-serialize object from XML bytes. XML bytes can contain Byte Order Mark (BOM).
 		/// </summary>
-		/// <param name="xml">XML string representing object.</param>
+		/// <param name="bytes">XML bytes representing object.</param>
 		/// <param name="type">Type of object.</param>
 		/// <param name="encoding">Encoding to use (default is UTF8) if Byte Order Mark (BOM) is missing.</param>
 		/// <returns>Object.</returns>
@@ -549,7 +557,6 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// De-serialize object from XML string.
 		/// </summary>
 		/// <param name="xml">XML string representing object.</param>
-		/// <param name="encoding">The encoding to use (default is UTF8).</param>
 		/// <returns>Object.</returns>
 		public static T DeserializeFromXmlString<T>(string xml)
 		{
@@ -570,8 +577,7 @@ namespace JocysCom.ClassLibrary.Runtime
 		/// <summary>
 		/// De-serialize object from XML bytes. XML bytes can contain Byte Order Mark (BOM).
 		/// </summary>
-		/// <param name="xml">XML string representing object.</param>
-		/// <param name="type">Type of object.</param>
+		/// <param name="bytes">XML bytes representing object.</param>
 		/// <param name="encoding">The encoding to use (default is UTF8) if Byte Order Mark (BOM) is missing.</param>
 		/// <returns>Object.</returns>
 		public static T DeserializeFromXmlBytes<T>(byte[] bytes, Encoding encoding = null)

@@ -17,7 +17,7 @@ namespace JocysCom.ClassLibrary.Collections
 		/// <param name="target">The target list to update; must support Insert and RemoveAt; must not be null.</param>
 		/// <param name="comparer">Optional equality comparer; defaults to <see cref="EqualityComparer{T}.Default"/>.</param>
 		/// <remarks>
-		/// Uses a <see cref="Dictionary{T,int}"/> for fast source lookups; overall time complexity is O(n^2) due to list insert/remove operations.
+		/// Uses a <see cref="Dictionary{TKey, TValue}"/> for fast source lookups; overall time complexity is O(n^2) due to list insert/remove operations.
 		/// Try to use quick sort algorithm by using uniqueSortName/index.
 		/// When target is <see cref="ObservableCollection{T}"/>, uses <see cref="ObservableCollection{T}.Move(int, int)"/> to avoid triggering remove and insert events.
 		/// </remarks>

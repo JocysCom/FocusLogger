@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+# Line endings: Let Git handle normalization via .gitattributes and core.autocrlf
+# - Repository stores LF (normalized by Git)
+# - Working tree uses OS-native line endings (CRLF on Windows, LF on Unix)
+# - Uncomment below to force editors to use LF (useful for LF-everywhere workflows):
+# end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Spaces at the end can be meaningful in Markdown (hard line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# Windows PowerShell 5.1 can misinterpret UTF-8 without BOM when non-ASCII exists.
+# If you are PowerShell 7+ only, you may prefer charset = utf-8 here.
+[*.ps1]
+charset = utf-8-bom

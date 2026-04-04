@@ -1,5 +1,8 @@
 using System;
+#if NETFRAMEWORK
 using System.Data.SqlClient;
+#else
+#endif
 
 namespace JocysCom.ClassLibrary.Data
 {
