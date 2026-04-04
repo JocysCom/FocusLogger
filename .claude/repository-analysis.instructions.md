@@ -1,351 +1,261 @@
-﻿# FocusLogger Repository Analysis
+# Repository Analysis
 
-This document provides a comprehensive analysis of the Jocys.com FocusLogger repository from the perspectives of a Software Architect, Software Developer, and Product Manager.
+## 1. Repository Overview
 
-## 1. Software Architect Analysis
+This document provides a factual reference for the Jocys.com FocusLogger repository, aimed at developers and AI coding agents working on the codebase.
 
-### 1.1. Overall Architecture
-FocusLogger is a desktop application for Microsoft Windows (7 SP1+), built using **.NET 6.0**. The primary UI framework is **Windows Presentation Foundation (WPF)**, with evidence of **Windows Forms** interoperability (`UseWindowsForms` is true in the `.csproj`), mainly for P/Invoke calls and potentially some low-level system interactions (like DPI awareness setup).
+**FocusLogger** is a Windows desktop utility that monitors and logs which process or program takes window focus. It targets users (especially gamers and power users) who experience unexpected focus stealing — where a background process briefly grabs foreground focus, interrupting gameplay or work. The tool logs every focus change with timestamps, process details, window class names, and focus-state flags, allowing users to identify the culprit.
 
-The application follows a fairly traditional structure for a utility tool:
-*   **Single Executable (`WinExe`):** All functionality is compiled into a single `.exe`.
-*   **Event-Driven:** The core logic revolves around monitoring system events (window focus changes) using a timer-based polling mechanism that calls Windows API functions.
-*   **UI Layer:** WPF is used for the user interface, with XAML defining the layout and C# for the code-behind.
-*   **Core Logic Layer:** C# classes handle data acquisition (via P/Invoke), data processing, and managing the collection of logged events.
-*   **Shared Library (`JocysCom.ClassLibrary`):** The application heavily relies on a comprehensive shared library, parts of which are embedded directly into the `FocusLogger/JocysCom/` directory. This library provides common functionalities for configuration, component model (data binding, collections), UI controls, and other utilities. The use of `MakeLinks.ps1` suggests these shared components might be hard-linked from a central repository.
+- **Repository:** https://github.com/JocysCom/FocusLogger
+- **License:** GNU General Public License v3.0
+- **Current version:** 1.2.6
+- **Target platform:** Windows 7 SP1+ with .NET 8.0
+- **Primary audiences:** Gamers, power users, IT support personnel diagnosing focus-stealing issues.
+
+## 2. Top-Level Structure
+
+This section maps every top-level directory and file to help navigate the repository quickly.
+
+| Path | Purpose |
+|------|---------|
+| `FocusLogger/` | Main application project (WPF, .NET 8.0). Contains all app source code, shared library, and resources. |
+| `FocusLogger.Tests/` | MSTest test project. Unit tests for CSV export and UI automation tests. |
+| `Documents/` | Release engineering: signing scripts, zip packaging scripts, screenshot tooling, and pre-built release files. |
+| `Resources/` | Solution-level shared scripts (currently `ZipFiles.ps1` for checksum-aware zip packaging). |
+| `.ai/` | AI agent instructions and repository analysis (this file). |
+| `JocysCom.FocusLogger.slnx` | Solution file (XML-based `.slnx` format) referencing the two projects. |
+| `README.md` | Project overview, download link, system requirements, screenshot. |
+| `LICENSE` | GPLv3 license text. |
+| `SECURITY.md` | Security vulnerability reporting policy (support@jocys.com). |
+| `Settings.XamlStyler` | XamlStyler configuration for consistent XAML formatting. |
+| `Solution_Cleanup.ps1` | PowerShell script for cleaning build artifacts. |
+
+## 3. Technology Stack & Key Dependencies
+
+This section lists verified technologies and versions drawn from project files.
+
+| Technology | Version / Detail | Evidence |
+|------------|-----------------|----------|
+| .NET | 8.0 (`net8.0-windows`) | `JocysCom.FocusLogger.csproj` TargetFramework |
+| C# | Implicit (SDK default for .NET 8) | SDK-style project |
+| WPF | `<UseWPF>true</UseWPF>` | csproj |
+| Windows Forms interop | `<UseWindowsForms>true</UseWindowsForms>` | csproj — used for P/Invoke helpers and DPI awareness |
+| MSTest | v3.x (`MSTest.TestFramework 3.*`, `MSTest.TestAdapter 3.*`) | Test csproj PackageReference |
+| Microsoft.NET.Test.Sdk | 17.x | Test csproj PackageReference |
+| Windows API (user32.dll) | P/Invoke | `NativeMethods.cs` |
+| PowerShell | Scripts for build, sign, zip, cleanup | `Documents/`, `Resources/`, root |
+| XamlStyler | Config present | `Settings.XamlStyler` |
+
+**No NuGet package dependencies** in the main application project — all functionality comes from .NET SDK and the embedded `JocysCom.ClassLibrary`.
+
+## 4. Architecture & Runtime Model
+
+This section describes how the application is structured and how it operates at runtime.
+
+FocusLogger is a **single-executable WPF desktop application** that polls Windows API functions to detect focus changes. It does not persist log data between sessions (in-memory only) but provides CSV export for offline analysis.
+
+### Architectural layers
 
 ```mermaid
 graph TD
-    subgraph UserSystem [User's Windows System]
-        direction LR
-        WinAPI[Windows API (user32.dll)]
+    subgraph UI["UI Layer (WPF)"]
+        App["App.xaml.cs<br/>Entry point, DPI aware"]
+        MW["MainWindow.xaml.cs<br/>Main window frame"]
+        DLC["DataListControl.xaml.cs<br/>Core logging UI + logic"]
     end
 
-    subgraph FocusLoggerApp [FocusLogger Application (.NET 6 WPF)]
-        direction TB
-        AppCs[App.xaml.cs (Entry Point, DPI Aware)] --> MainWin[MainWindow.xaml.cs (Main UI Frame)]
-        MainWin --> DataListCtrl[DataListControl.xaml.cs (Core Logic & Display)]
-        DataListCtrl -- Polls & Displays --> LogData[SortableBindingList<DataItem> (In-Memory Log)]
-        DataListCtrl -- Uses --> NativeMethodsApp[FocusLogger.Common.NativeMethods.cs (P/Invoke for Focus)]
-        NativeMethodsApp -- Calls --> WinAPI
-
-        subgraph SharedLib [JocysCom.ClassLibrary (Embedded in FocusLogger/JocysCom/)]
-            direction TB
-            SettingsMgmt[Configuration (SettingsData, AssemblyInfo)]
-            ComponentModel[ComponentModel (NotifyPropertyChanged, SortableBindingList)]
-            ControlsLib[Controls (ControlsHelper, InfoControl, ItemFormattingConverter)]
-            OtherUtils[Other Utilities (IO, Text, etc.)]
-        end
-
-        AppCs -- Uses Resources --> ControlsLib
-        MainWin -- Uses --> ControlsLib
-        MainWin -- Uses --> SettingsMgmt
-        DataListCtrl -- Uses --> ComponentModel
-        DataListCtrl -- Uses --> ControlsLib
-        LogData -- Composed of --> DataItem[FocusLogger.Common.DataItem.cs (Log Entry Model)]
-        DataItem -- Inherits from --> SettingsMgmtBase[SettingsItem (from JocysCom.Configuration)]
-
+    subgraph Core["Core Logic"]
+        DI["DataItem.cs<br/>Log entry model"]
+        DIT["DataItemType.cs<br/>Entry type enum"]
+        NM["NativeMethods.cs<br/>P/Invoke declarations"]
+        CSV["CSV Export<br/>BuildCsvContent, CsvEscape"]
     end
 
-    style FocusLoggerApp fill:#f9f,stroke:#333,stroke-width:2px
-    style SharedLib fill:#ccf,stroke:#333,stroke-width:1px
-    style UserSystem fill:#eee,stroke:#333,stroke-width:1px
+    subgraph Shared["JocysCom.ClassLibrary (embedded)"]
+        Config["Configuration<br/>SettingsData, SettingsItem, AssemblyInfo"]
+        CompModel["ComponentModel<br/>SortableBindingList, BindingListInvoked"]
+        Controls["Controls<br/>ControlsHelper, ItemFormattingConverter,<br/>InfoControl, MessageBoxWindow"]
+        Other["Collections, IO, Text, Runtime, Data"]
+    end
+
+    subgraph WinAPI["Windows OS"]
+        User32["user32.dll"]
+    end
+
+    App --> MW --> DLC
+    DLC --> DI
+    DLC --> NM
+    DLC --> CSV
+    NM --> User32
+    DI --> Config
+    DLC --> CompModel
+    DLC --> Controls
+    MW --> Controls
 ```
 
-### 1.2. Key Components & Modules
-1.  **Application Core (`FocusLogger/App.xaml.cs`, `FocusLogger/AssemblyInfo.cs`):**
-    *   Responsibilities: Application entry point, initialization (DPI awareness), global resource loading (themes, icons).
-    *   Key Files: `App.xaml`, `App.xaml.cs`.
+### Key architectural decisions
 
-2.  **Main User Interface (`FocusLogger/MainWindow.xaml.cs`):**
-    *   Responsibilities: Provides the main window frame, hosts the primary controls. Initializes UI helper contexts.
-    *   Key Files: `MainWindow.xaml`, `MainWindow.xaml.cs`.
-    *   Uses `JocysCom.ClassLibrary.Controls.InfoControl` for an information panel.
+- **Polling via timer:** A `System.Timers.Timer` with 1ms interval (non-auto-reset) continuously polls `GetActiveWindow()` and `GetForegroundWindow()`. Duplicate events are suppressed via `DataItem.IsSame()`.
+- **Thread safety:** Timer fires on a thread-pool thread; UI updates are marshalled via `ControlsHelper.BeginInvoke()`. A `lock(AddLock)` synchronizes the polling logic.
+- **Embedded shared library:** `JocysCom.ClassLibrary` files are included directly in `FocusLogger/JocysCom/` rather than as a compiled DLL or NuGet package.
+- **No MVVM framework:** Code-behind pattern with data binding. `DataListControl.xaml.cs` contains both view-model-like logic and model interaction.
 
-3.  **Focus Logging & Display (`FocusLogger/Controls/DataListControl.xaml.cs`):**
-    *   Responsibilities: This is the engine of the application.
-        *   Periodically polls for active and foreground window changes using a `System.Timers.Timer`.
-        *   Retrieves window and process information using P/Invoke calls.
-        *   Populates `DataItem` objects with the collected data.
-        *   Manages a `SortableBindingList<DataItem>` to store log entries.
-        *   Displays log entries in a `DataGrid`.
-        *   Handles UI updates in a thread-safe manner using `ControlsHelper.BeginInvoke`.
-        *   Provides a "Clear" functionality for the log.
-    *   Key Files: `DataListControl.xaml`, `DataListControl.xaml.cs`.
+## 5. Project Inventory
 
-4.  **Data Model (`FocusLogger/Common/DataItem.cs`):**
-    *   Responsibilities: Defines the structure for a single log entry, including timestamp, process information, window title, and focus state (active, mouse, keyboard, caret).
-    *   Inherits from `JocysCom.ClassLibrary.Configuration.SettingsItem` for `INotifyPropertyChanged` support.
-    *   Key Files: `DataItem.cs`.
+This section lists each project in the solution with its key metadata.
 
-5.  **Native Windows API Interaction (`FocusLogger/Common/NativeMethods.cs`):**
-    *   Responsibilities: Encapsulates all P/Invoke declarations and helper methods for interacting with `user32.dll` functions (e.g., `GetForegroundWindow`, `GetActiveWindow`, `GetGUIThreadInfo`, `GetWindowText`, `GetWindowThreadProcessId`).
-    *   Key Files: `NativeMethods.cs`.
+### 5.1 JocysCom.FocusLogger (main application)
 
-6.  **Shared Library (`FocusLogger/JocysCom/` - representing `JocysCom.ClassLibrary`):**
-    *   **Configuration (`FocusLogger/JocysCom/Configuration/`):**
-        *   Provides robust settings management (`SettingsData<T>`, `SettingsItem`, `SettingsHelper`). Includes serialization, compression, file monitoring, and checksums.
-        *   `AssemblyInfo` class for retrieving application metadata.
-        *   Used by `DataItem` (inherits `SettingsItem`) and `MainWindow` (for title).
-    *   **ComponentModel (`FocusLogger/JocysCom/ComponentModel/`):**
-        *   `NotifyPropertyChanged`: Base class for `INotifyPropertyChanged`.
-        *   `BindingListInvoked<T>`: Thread-safe `BindingList<T>`.
-        *   `SortableBindingList<T>`: Extends `BindingListInvoked<T>` with sorting (`IBindingListView`) and item change notification capabilities. Used for `DataItems` in `DataListControl`.
-        *   `PropertyComparer<T>`: Used for custom sorting.
-    *   **Controls (`FocusLogger/JocysCom/Controls/`):**
-        *   `ControlsHelper`: Provides utility functions for controls, including `InitInvokeContext` (for UI thread marshalling), `BeginInvoke`, and `IsDesignMode`.
-        *   `ItemFormattingConverter`: A versatile `IMultiValueConverter` used in `DataListControl` for complex cell formatting.
-        *   `InfoControl`: A reusable WPF control for displaying information (used in `MainWindow`).
-        *   Theme and Icon resources (`Themes/Default.xaml`, `Themes/Icons.xaml`).
-    *   Other modules like `IO`, `Text`, `Runtime`, `Collections`, `Data` provide further utilities.
+| Property | Value |
+|----------|-------|
+| Path | `FocusLogger/JocysCom.FocusLogger.csproj` |
+| Output type | `WinExe` |
+| Target framework | `net8.0-windows` |
+| Assembly name | `JocysCom.FocusLogger` |
+| Description | Find out which process or program is taking the window focus. In game, mouse and keyboard could temporarily stop responding if another program takes the focus. This tool could help diagnose which program is stealing the focus. |
+| Version | 1.2.6 |
+| NuGet dependencies | None |
+| Embedded resources | `Resources/BuildDate.txt` (auto-generated), `Resources/AiAnalysisPrompt.md` |
 
-### 1.3. Dependencies
-*   **Internal:**
-    *   `FocusLogger` (main app) depends heavily on `JocysCom.ClassLibrary` (embedded).
-    *   `DataListControl` depends on `FocusLogger.Common.NativeMethods` and `FocusLogger.Common.DataItem`.
-    *   `DataItem` depends on `JocysCom.ClassLibrary.Configuration.SettingsItem`.
-*   **External:**
-    *   .NET 6.0 SDK (WPF, Windows Forms support).
-    *   Windows API (`user32.dll`).
+**Source structure:**
 
-### 1.4. Data Management
-*   **Primary Data:** The log of focus events, stored in-memory as a `SortableBindingList<DataItem>` within `DataListControl`.
-*   **Data Model:** `DataItem.cs` defines the schema for each log entry.
-*   **Persistence:** The application, as analyzed, does not appear to persist the focus log itself between sessions. The `SettingsData<T>` infrastructure from `JocysCom.ClassLibrary` is present and `DataItem` inherits `SettingsItem`, so the capability to save/load these items exists, but it's not explicitly used for the log in `DataListControl`. It might be used for application settings if any were defined (none obvious in the current scope).
-*   **Data Flow:**
-    1.  Timer in `DataListControl` fires.
-    2.  `UpdateInfo()` calls `NativeMethods` to get window handles and `GUITHREADINFO`.
-    3.  `GetItemFromHandle()` creates a `DataItem` and populates it.
-    4.  `UpdateFromProcess()` enriches `DataItem` with process name and path.
-    5.  `DataItem` is added to `DataItems` list via `ControlsHelper.BeginInvoke`.
-    6.  `DataGrid` in `DataListControl.xaml` (bound to `DataItems`) updates, using `ItemFormattingConverter` for display.
+| Directory | Contents |
+|-----------|----------|
+| `FocusLogger/` (root) | `App.xaml(.cs)`, `MainWindow.xaml(.cs)`, `AssemblyInfo.cs`, `App.ico` |
+| `FocusLogger/Common/` | `DataItem.cs`, `DataItemType.cs`, `NativeMethods.cs` |
+| `FocusLogger/Controls/` | `DataListControl.xaml(.cs)` — core logging control |
+| `FocusLogger/JocysCom/` | Embedded `JocysCom.ClassLibrary` (~30 files across Collections, Common, ComponentModel, Configuration, Controls, Data, IO, Runtime, Text) |
+| `FocusLogger/Resources/` | `AiAnalysisPrompt.md`, `BuildDate.txt`, `Icons/` (SVG sources, XAML icons, conversion scripts) |
+| `FocusLogger/Properties/` | Publish profiles |
 
-```mermaid
-sequenceDiagram
-    participant Timer as Timer (in DataListControl)
-    participant UpdateInfo as UpdateInfo() (in DataListControl)
-    participant NativeMethods as NativeMethods (FocusLogger.Common)
-    participant DataItem as DataItem
-    participant DataItemsList as SortableBindingList<DataItem>
-    participant DataGrid as DataGrid (UI)
+### 5.2 JocysCom.FocusLogger.Tests (test project)
 
-    Timer->>UpdateInfo: Elapsed Event (Poll)
-    UpdateInfo->>NativeMethods: GetActiveWindow(), GetForegroundWindow()
-    NativeMethods-->>UpdateInfo: Window Handles
-    UpdateInfo->>NativeMethods: GetInfo(hWnd), GetWindowText(hWnd), GetWindowThreadProcessId(hWnd)
-    NativeMethods-->>UpdateInfo: GUITHREADINFO, Title, PID
-    UpdateInfo->>DataItem: new DataItem(info)
-    UpdateInfo->>Process: GetProcessById(PID).MainModule.FileName
-    Process-->>UpdateInfo: Process Name, Path
-    UpdateInfo->>DataItem: Populate ProcessName, ProcessPath
-    UpdateInfo->>DataItemsList: BeginInvoke(Insert(0, dataItem))
-    DataItemsList->>DataGrid: NotifyListChanged (via Binding)
-    DataGrid->>DataGrid: Render New Item (using ItemFormattingConverter)
-```
+| Property | Value |
+|----------|-------|
+| Path | `FocusLogger.Tests/JocysCom.FocusLogger.Tests.csproj` |
+| Target framework | `net8.0-windows` |
+| Test framework | MSTest v3.x |
+| Project reference | `FocusLogger/JocysCom.FocusLogger.csproj` |
 
-### 1.5. Configuration
-*   Application configuration (e.g., user preferences) doesn't seem to be a prominent feature based on the core logging functionality.
-*   However, the `JocysCom.ClassLibrary.Configuration` module provides extensive capabilities for this if needed.
-*   The application title is configured dynamically using `JocysCom.ClassLibrary.Configuration.AssemblyInfo`.
-*   Build date is embedded as a resource (`Resources/BuildDate.txt`) via a pre-build event in the `.csproj` file.
+**Test files:**
 
-### 1.6. Cross-cutting Concerns
-*   **Error Handling:**
-    *   Present in `DataListControl.UpdateFromProcess()` when accessing process information (e.g., `MainModule.FileName` can throw exceptions for restricted processes). It catches exceptions, sets `DataItem.NonPath = true`, and provides informative error messages, including a hint to "Run as Administrator" for access denied errors.
-    *   The P/Invoke calls in `NativeMethods` generally don't show explicit `SetLastError=true` and `Marshal.GetLastWin32Error()` handling, but some API calls might return error codes or null pointers which are checked (e.g., `GetGUIThreadInfo` result).
-*   **Logging (Meta):** The application *is* a logger. It doesn't seem to have its own internal diagnostic logging system beyond what's presented to the user.
-*   **Threading & Concurrency:**
-    *   A `System.Timers.Timer` is used for polling, which operates on a separate thread.
-    *   UI updates from the timer's elapsed event are marshalled to the UI thread using `ControlsHelper.BeginInvoke()`.
-    *   `BindingListInvoked<T>` (base for `SortableBindingList<T>`) is designed to raise `ListChanged` events on the UI thread.
-    *   An `AddLock` object (`lock (AddLock)`) is used in `UpdateInfo()` to synchronize access when checking old/new items and preparing to add to the `DataItems` collection.
-*   **DPI Awareness:** Explicitly handled in `App.xaml.cs` by calling `SetProcessDPIAware()`.
-*   **Resource Management:** Standard WPF resource dictionaries are used for themes and icons.
+| File | Purpose |
+|------|---------|
+| `CsvExportTests.cs` | Unit tests for `CsvEscape` and `BuildCsvContent` methods |
+| `UIAutomationTests.cs` | UI automation tests using `System.Windows.Automation` — launches the built app and interacts with controls by AutomationId |
 
-## 2. Software Developer Analysis
+Run tests with: `dotnet test FocusLogger.Tests/JocysCom.FocusLogger.Tests.csproj`
 
-### 2.1. Coding Conventions & Patterns
-*   **Naming Conventions:** Generally follows Microsoft C# naming conventions (PascalCase for classes, methods, properties; camelCase for local variables and private fields, though some private fields like `_Date` use PascalCase with an underscore prefix).
-*   **Code Structure:**
-    *   Well-organized into namespaces (`JocysCom.FocusLogger`, `JocysCom.FocusLogger.Controls`, `JocysCom.FocusLogger.Common`).
-    *   The `JocysCom.ClassLibrary` components are also well-structured into namespaces like `JocysCom.ClassLibrary.Configuration`, `JocysCom.ClassLibrary.ComponentModel`, etc.
-    *   Use of `partial class` for XAML code-behind and potentially for extending classes like `AssemblyInfo`.
-*   **P/Invoke:** Neatly encapsulated within `NativeMethods` classes (one in `FocusLogger.Common` for app-specific needs, one in `App.xaml.cs` for DPI, and likely others within `JocysCom.ClassLibrary` like in `AssemblyInfo.cs`).
-*   **WPF Usage:**
-    *   MVVM (Model-View-ViewModel) is not strictly followed. The code-behind (`DataListControl.xaml.cs`) contains significant logic (View-Model like responsibilities and even Model interaction). This is common for smaller utilities.
-    *   Data binding is used extensively in `DataListControl.xaml` to bind `DataGrid` columns to `DataItem` properties.
-    *   `INotifyPropertyChanged` is implemented in `JocysCom.ClassLibrary.ComponentModel.NotifyPropertyChanged` and used by `SettingsItem` and thus `DataItem`.
-    *   Use of `IMultiValueConverter` (`ItemFormattingConverter`) for complex cell display logic.
-    *   Resource Dictionaries for styling and icons.
-*   **Error Handling:** `try-catch` blocks are used in critical sections like process information retrieval.
-*   **Comments:** Good use of XML documentation comments for P/Invoke methods in `NativeMethods.cs`. Other comments explain specific logic (e.g., DPI awareness).
-*   **Thread Safety:** Explicit `lock` statements and UI thread invocation (`BeginInvoke`) show awareness of threading issues.
+## 6. Dependency & Data Flow
 
-### 2.2. Core Logic Implementation
-*   **Focus Detection Loop (`DataListControl.UpdateInfo`):**
-    *   The core logic relies on a high-frequency timer (1ms interval, though effective polling rate will be slower due to work done).
-    *   It polls both `GetActiveWindow()` and `GetForegroundWindow()`. The distinction is subtle: `GetActiveWindow` is tied to the calling thread's message queue, while `GetForegroundWindow` is system-wide. Logging both might be for thoroughness or to catch specific edge cases.
-    *   `DataItem.IsSame()` is used to avoid logging redundant entries if only minor properties (like window title) change but the core focus state (PID, focus flags) remains the same for the *same type* of event (active vs. foreground).
-    *   `GetItemFromHandle()` is a key helper that uses `NativeMethods.GetInfo()` (which wraps `GetGUIThreadInfo`) to determine `HasMouse`, `HasKeyboard`, `HasCaret` states.
-*   **Process Information (`DataListControl.UpdateFromProcess`):**
-    *   Retrieves `ProcessName` and `MainModule.FileName`.
-    *   Handles the "System Idle Process" (PID 0) as a special case.
-    *   Robust error handling for `MainModule.FileName` access, which is crucial as it often requires elevated privileges for other processes.
-*   **Data Display (`DataListControl._MainDataGridFormattingConverter_Convert`):**
-    *   This converter centralizes much of the display logic for the `DataGrid`. It translates boolean focus states into icons and formats dates. This keeps the XAML cleaner but puts display logic into C# code.
+This section explains how the projects and components relate to each other and how data moves through the system.
 
-### 2.3. `JocysCom.ClassLibrary` (Embedded)
-*   This is a significant piece of reusable code.
-*   **Strengths:**
-    *   Provides well-thought-out solutions for common problems: settings management (`Configuration`), data binding (`ComponentModel`), UI utilities (`Controls`).
-    *   Features like thread-safe collections, sortable/filterable lists, file monitoring for settings, and compression are advanced and useful.
-    *   Promotes consistency across Jocys.com projects.
-*   **Integration:** The use of `MakeLinks.ps1` (and its C# helper `MakeLinks.ps1.cs`) suggests that these library files are hard-linked into the project. This avoids needing to compile the library separately and reference it as a DLL or NuGet package, simplifying the build for this specific project, but can make managing library versions across multiple projects more complex if not handled carefully.
-*   **Design:** The library components seem designed for flexibility (e.g., generic `SettingsData<T>`).
-
-### 2.4. UI Implementation (WPF)
-*   **Layout:** Simple and effective, using `Grid` and `ToolBarPanel`.
-*   **Controls:** Standard `DataGrid`, `Button`, `Label`, `ContentControl`. Custom controls include `InfoControl` (from shared lib) and `DataListControl` (app-specific).
-*   **Data Binding:** Core to `DataListControl`, binding `DataGrid.ItemsSource` to `SortableBindingList<DataItem>` and columns to `DataItem` properties.
-*   **Styling & Theming:** Uses `ResourceDictionary` for styles (`TextBlockCell`, `ButtonStackPanel`, etc.) and icons. This allows for a consistent look and feel. The icons seem to be a mix of SVG (converted to XAML, as suggested by `Convert_SVG_to_XAML.ps1` files in theme folders) and direct XAML paths.
-*   **Responsiveness:** UI updates are marshalled to the UI thread. The polling mechanism itself, if too frequent or if P/Invoke calls are slow, could potentially impact UI responsiveness, but the 1ms timer interval is likely just to ensure rapid rescheduling, not that it polls 1000 times/sec.
-
-### 2.5. Build & Deployment
-*   **.csproj:** Standard .NET SDK style. Includes a pre-build event to generate `BuildDate.txt`.
-*   **Scripts:**
-    *   `Solution_Cleanup.ps1`: Likely for cleaning build artifacts.
-    *   `FocusLogger/Documents/app_sign.ps1`: For code signing the application.
-    *   `FocusLogger/Documents/app_zip.bat`: For packaging the application into a ZIP file (as seen in README's download link).
-    *   `FocusLogger/JocysCom/MakeLinks.ps1`: Manages hard links for shared library components.
-    *   Various `Convert_SVG_to_XAML.ps1` scripts: Indicate a workflow for converting SVG icons to XAML.
-*   **Output:** A single `.exe` file.
-*   **Dependencies:** Relies on .NET 6.0 being installed on the user's system.
-
-### 2.6. Code Quality & Maintainability
-*   **Readability:** Generally good. Method and variable names are mostly clear.
-*   **Modularity:** Good separation of concerns with `NativeMethods`, `DataItem`, `DataListControl`, and the extensive `JocysCom.ClassLibrary`.
-*   **Complexity:** The core focus detection logic in `DataListControl` is somewhat complex due to the nature of Windows API interactions and threading. The `ItemFormattingConverter` also centralizes a lot of display logic.
-*   **Potential Issues/Refinements:**
-    *   The 1ms timer interval in `DataListControl` is aggressive. While `AutoReset = false` and re-`Start()` means it's a polling loop, the actual frequency depends on how long `UpdateInfo()` takes. A slightly longer, more configurable interval, or event-driven hooks (if available and reliable for focus changes, e.g., `SetWinEventHook`), might be more efficient, though `SetWinEventHook` can be complex to implement correctly.
-    *   The `HMan` field in `MainWindow.xaml.cs` is unassigned and seems unused.
-    *   The `WindowTiteColumn` in `DataListControl.xaml` has a typo ("Tite" instead of "Title").
-    *   The `DataItem.NonPath` property name is a bit unclear; `PathResolutionError` or similar might be more descriptive.
-    *   The distinction in logging `GetActiveWindow()` vs. `GetForegroundWindow()` separately could potentially lead to near-duplicate entries if their changes are closely correlated. The `IsSame()` check helps, but the rationale for tracking both distinctly could be clarified with comments.
-
-### 2.7. Mermaid Diagram: Core Data Flow in DataListControl
-```mermaid
-graph TD
-    A[Timer Elapsed Event] --> B{UpdateInfo()};
-    B --> C{Get Active Window Handle (NativeMethods)};
-    C --> D{GetItemFromHandle(activeHandle, true)};
-    D --> E{DataItem activeItem};
-    B --> F{Get Foreground Window Handle (NativeMethods)};
-    F --> G{GetItemFromHandle(foregroundHandle, false)};
-    G --> H{DataItem foregroundItem};
-
-    subgraph ProcessActiveItem [Process Active Item]
-        E --> I{activeItem.IsSame(oldActiveItem)?};
-        I -- No --> J{UpdateFromProcess(activeItem)};
-        J --> K[ControlsHelper.BeginInvoke Add to DataItemsList];
-    end
-
-    subgraph ProcessForegroundItem [Process Foreground Item]
-        H --> L{foregroundItem.IsSame(oldForegroundItem)?};
-        L -- No --> M{UpdateFromProcess(foregroundItem)};
-        M --> N[ControlsHelper.BeginInvoke Add to DataItemsList];
-    end
-
-    K --> O[DataGrid Updates];
-    N --> O;
-
-    style ProcessActiveItem fill:#lightgreen,stroke:#333
-    style ProcessForegroundItem fill:#lightblue,stroke:#333
-```
-
-## 3. Product Manager Analysis
-
-### 3.1. Product Purpose & Value Proposition
-*   **Product Name:** Jocys.com Focus Logger
-*   **Purpose:** To help users identify which process or program is unexpectedly taking window focus.
-*   **Value Proposition:** Solves a common frustration, especially for gamers or users running full-screen applications, where an unknown background process can steal focus, interrupting gameplay or work. This tool provides diagnostic information to pinpoint the culprit.
-*   **Target Audience:**
-    *   Gamers.
-    *   Power users experiencing focus stealing issues.
-    *   IT support personnel diagnosing system behavior.
-
-### 3.2. Key Features (Evident from Code & README)
-1.  **Focus Event Logging:** Records instances of window focus changes.
-2.  **Detailed Information per Event:**
-    *   Timestamp (down to milliseconds).
-    *   Process ID (PID).
-    *   Process Name.
-    *   Process Full Path (with error handling for access issues).
-    *   Window Title of the focused window.
-    *   Focus State Indicators:
-        *   Is Active Window (icon 'A').
-        *   Has Mouse Focus/Capture (icon 'M').
-        *   Has Keyboard Focus (icon 'K').
-        *   Has Caret (icon 'C').
-3.  **Real-time Updates:** The log updates continuously as focus changes occur.
-4.  **Clear Log:** A button to clear all recorded events from the display.
-5.  **UI:**
-    *   Displays data in a sortable, clear `DataGrid`.
-    *   Uses icons for quick visual assessment of focus states.
-    *   Indicates if running as Administrator might be needed for full process path details.
-6.  **DPI Awareness:** Renders correctly on high-DPI screens.
-
-### 3.3. User Workflows
-1.  **Launch Application:** User starts `JocysCom.FocusLogger.exe`.
-2.  **Observe Log:** The main window opens, and the `DataListControl` immediately starts logging focus events. New events appear at the top of the list.
-3.  **Identify Focus Stealer:**
-    *   User experiences a focus stealing event (e.g., game minimizes).
-    *   User switches to FocusLogger and examines the most recent entries.
-    *   The `Process Name`, `Process Path`, and `Window Title` help identify the offending application.
-4.  **Clear Log (Optional):** User clicks the "Clear" button to remove old events and monitor new ones.
-5.  **Close Application:** User closes the window.
+### Project dependency graph
 
 ```mermaid
 graph LR
-    A[Launch FocusLogger] --> B(Application Starts Logging);
-    B --> C{Focus Stealing Event Occurs};
-    C --> D[User Checks FocusLogger];
-    D --> E[Identify Culprit Process from Log];
-    B --> F[User Clicks 'Clear' Button];
-    F --> B;
-    B --> G[User closes Application];
+    Tests["FocusLogger.Tests<br/>(MSTest v3)"] -->|ProjectReference| App["JocysCom.FocusLogger<br/>(WPF App)"]
+    App -->|embedded source| Shared["JocysCom.ClassLibrary<br/>(in FocusLogger/JocysCom/)"]
+    App -->|P/Invoke| WinAPI["user32.dll"]
 ```
 
-### 3.4. UI/UX (User Interface / User Experience)
-*   **Clarity:** The UI is relatively simple and focused on its task. The `DataGrid` is a good choice for displaying tabular log data.
-*   **Information Density:** Provides a good amount of relevant information for each event.
-*   **Icons:** The use of 'A', 'M', 'K', 'C' icons for focus states is a good shorthand, though tooltips on column headers are essential for discoverability (which are present).
-*   **Real-time Feedback:** The log updating in real-time is crucial for its purpose.
-*   **Error Indication:** The handling of process path errors (showing an error message and suggesting "Run as Administrator") is good UX.
-*   **Potential Improvements (UX):**
-    *   **Filtering/Searching:** For long logs, the ability to filter by process name or search window titles would be very helpful. The underlying `SortableBindingList` supports filtering, but it's not exposed in the UI.
-    *   **Highlighting:** Option to highlight new entries or entries from specific processes.
-    *   **Pause/Resume Logging:** A button to pause and resume logging could be useful if the user wants to freeze the log while examining it without new entries pushing old ones down.
-    *   **Copy to Clipboard:** Functionality to easily copy selected log entries (or the whole log) to the clipboard in a text format.
-    *   **Configuration:**
-        *   Polling interval adjustment (advanced users).
-        *   Option to choose which columns are visible.
-    *   **"System Idle Process" path:** Could be "N/A" or "System" instead of "System Idle Process" for the path, as it's not a file path.
+### Runtime data flow
 
-### 3.5. Help & Documentation
-*   **README.md:** Provides a good overview, download link, and screenshot.
-*   **In-App Help:**
-    *   The `InfoControl` at the top of `MainWindow` (named `InfoPanel`) is likely used to display some information, possibly version or basic usage tips, though its content isn't dynamically set in the provided `MainWindow.xaml.cs` beyond the window title. The `JocysCom.ClassLibrary.Controls.InfoHelpProvider` class exists (seen in file list), suggesting a more extensive help system might be part of the shared library.
-    *   Tooltips on column headers in the `DataGrid` act as micro-documentation.
-*   **Error Messages:** The message "Run as Administrator" is a form of contextual help.
+1. `System.Timers.Timer` fires (1ms interval, non-auto-reset).
+2. `DataListControl.UpdateInfo()` acquires `AddLock`.
+3. Calls `NativeMethods.GetActiveWindow()` and `NativeMethods.GetForegroundWindow()`.
+4. For each handle, `GetItemFromHandle()` creates a `DataItem` with timestamp, focus flags (mouse/keyboard/caret), window title, and window class name.
+5. `IsSame()` checks if the event differs from the previous one; if not, it is skipped.
+6. `UpdateFromProcess()` enriches the `DataItem` with process name and path (with error handling for restricted processes).
+7. The item is inserted at position 0 of `SortableBindingList<DataItem>` via `ControlsHelper.BeginInvoke()` (UI thread dispatch).
+8. The WPF `DataGrid` updates via data binding. `ItemFormattingConverter` translates boolean flags to icons.
 
-### 3.6. Potential Enhancements (Product Perspective)
-1.  **Event Grouping/Summarizing:** Option to group similar consecutive events or provide a summary view (e.g., "Process X took focus 5 times").
-2.  **Process Actions:** Right-click option on a log entry to:
-    *   Open file location of the process.
-    *   Go to process details (Task Manager).
-    *   (Advanced) Attempt to terminate the process.
-3.  **Rules/Alerts:** Allow users to define rules (e.g., "Alert me if process X takes focus").
-4.  **Export Log:** Option to save the log to a file (CSV, TXT).
-5.  **Silent Mode/Background Logging:** Option to log to a file in the background without the UI visible.
-6.  **More Granular Focus Information:** If possible, distinguish between different types of focus events more clearly (e.g., programmatic focus change vs. user-initiated).
-7.  **Integration with `SetWinEventHook`:** Explore using `SetWinEventHook` for `EVENT_SYSTEM_FOREGROUND` and `EVENT_OBJECT_FOCUS` instead of polling. This is event-driven and potentially more efficient, but more complex to implement correctly, especially regarding unhooking and thread affinity.
+### CSV export flow
+
+1. User clicks "Save CSV" button.
+2. `SaveFileDialog` prompts for file location.
+3. `BuildCsvContent()` iterates all `DataItem` entries, writing CSV with headers: Date, PID, Process Name, Active, Mouse, Keyboard, Caret, Window Title, Window Class, Path.
+4. File is written as UTF-8.
+5. "Explore" button opens the saved file location in Explorer.
+6. "AI Prompt Example" button shows the embedded `AiAnalysisPrompt.md` in a `MessageBoxWindow` for users to copy and paste into an AI assistant along with their CSV.
+
+## 7. Build, Test, CI/CD & Operational Workflows
+
+This section documents how the project is built, tested, and released based on repository evidence.
+
+### Build
+
+```bash
+dotnet build JocysCom.FocusLogger.slnx
+```
+
+- **Pre-build event:** Generates `Resources/BuildDate.txt` with the current ISO 8601 timestamp via PowerShell.
+- **Output:** Single `JocysCom.FocusLogger.exe` in `bin/{Configuration}/net8.0-windows/`.
+- **Debug configuration:** Embedded PDB symbols (`DebugType: embedded`).
+
+### Test
+
+```bash
+dotnet test FocusLogger.Tests/JocysCom.FocusLogger.Tests.csproj
+```
+
+- **Framework:** MSTest v3.x with Microsoft.NET.Test.Sdk 17.x.
+- **Unit tests:** `CsvExportTests` — validates CSV escaping and content generation.
+- **UI automation tests:** `UIAutomationTests` — launches the built application and interacts via `System.Windows.Automation`. Requires a prior build of the main project.
+
+### Release / packaging scripts
+
+| Script | Purpose |
+|--------|---------|
+| `Documents/App_1_Sign.ps1` | Code-signs the application executable. |
+| `Documents/App_2_Zip.ps1` | Packages the signed executable into a release ZIP. |
+| `Resources/ZipFiles.ps1` | Shared utility for checksum-aware ZIP creation (compares source/dest checksums before rebuilding). |
+| `Documents/Take_Screenshot.ps1` | Captures application screenshot for documentation. |
+| `Solution_Cleanup.ps1` | Cleans `bin/`, `obj/`, and other build artifacts. |
+
+### Icon workflow
+
+SVG icon sources are stored in `FocusLogger/Resources/Icons/Icons_Default/`. The script `Convert_SVG_to_XAML.ps1` converts them to XAML resource dictionaries (`Icons_Default.xaml`).
+
+### CI/CD
+
+No CI/CD workflow files were found under `.github/workflows/`. Builds and releases appear to be performed locally.
+
+## 8. Documentation Map
+
+This section identifies where documentation lives in the repository.
+
+| Location | Audience | Content |
+|----------|----------|---------|
+| `README.md` | End users, contributors | Project overview, download link, system requirements, screenshot |
+| `SECURITY.md` | Security researchers | Vulnerability reporting policy |
+| `LICENSE` | All | GPLv3 full text |
+| `.ai/instructions.md` | AI agents | Coding style guidelines for AI-assisted edits |
+| `.ai/repository-analysis.instructions.md` | AI agents, developers | This file — comprehensive repository reference |
+| `FocusLogger/Resources/AiAnalysisPrompt.md` | End users | Prompt template for users to paste into AI assistants alongside exported CSV logs |
+| `Documents/Images/` | README, users | Application screenshot |
+| `Settings.XamlStyler` | Developers | XamlStyler formatting configuration |
+
+## 9. AI-Agent-Relevant Conventions and Constraints
+
+This section captures rules and patterns that materially affect automated edits.
+
+1. **Coding style:** Follow Microsoft C# conventions. PascalCase for public members, camelCase for locals. Some private fields use `_PascalCase` (e.g., `_Date`). Preserve existing naming patterns in each file.
+
+2. **Doc comments:** Per `.ai/instructions.md`, convert simple comments to XML documentation comments where beneficial for IntelliSense. Do not alter surrounding code when doing so.
+
+3. **Shared library files (`FocusLogger/JocysCom/`):** These are embedded from a shared `JocysCom.ClassLibrary`. Exercise caution when editing — changes here may diverge from the upstream library.
+
+4. **XAML formatting:** The repository uses XamlStyler (see `Settings.XamlStyler`). XAML edits should conform to the configured style.
+
+5. **No NuGet packages in the main app:** All dependencies are framework-provided or embedded source. Do not introduce NuGet package dependencies without explicit approval.
+
+6. **Test project uses MSTest v3:** New tests should follow MSTest v3 patterns (`[TestClass]`, `[TestMethod]`, `Assert.*`).
+
+7. **UI automation tests depend on a built executable:** `UIAutomationTests` locate the app at a relative path from the test output. Building the main project before running these tests is required.
+
+8. **Pre-build event:** The csproj generates `Resources/BuildDate.txt` via PowerShell. This file should not be manually edited or committed.
+
+9. **Solution format:** Uses `.slnx` (XML-based solution format), not the older `.sln` text format.
+
+10. **No CI/CD pipelines:** All build and release steps are manual/local. Scripts in `Documents/` handle signing and packaging.
