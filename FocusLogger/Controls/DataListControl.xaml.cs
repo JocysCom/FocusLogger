@@ -151,7 +151,7 @@ namespace JocysCom.FocusLogger.Controls
 		{
 			var prompt = ClassLibrary.Helper.FindResource<string>("Resources/AiAnalysisPrompt.md").TrimEnd();
 			var box = new MessageBoxWindow();
-			box.SetSize(600, 400);
+			box.SetSize(720, 400);
 			box.ShowPrompt(prompt, "AI Analysis Prompt - Copy and paste into your AI assistant", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
 		}
 
