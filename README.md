@@ -14,7 +14,7 @@ Digitally Signed Application v1.2.6.0 (2026-04-04)
 
 - Microsoft Windows 10 or newer.
 
-  https://github.com/dotnet/core/blob/main/release-notes/6.0/supported-os.md
+  https://github.com/dotnet/core/blob/main/release-notes/8.0/supported-os.md
 - Microsoft .NET 8.0 (included with Windows Updates).
 
   https://dotnet.microsoft.com/download/dotnet
