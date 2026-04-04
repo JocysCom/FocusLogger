@@ -274,12 +274,6 @@
 					ElementStyle="{StaticResource TextBlockCell}"
 					Header="Window Title" />
 				<DataGridTextColumn
-					x:Name="WindowClassNameColumn"
-					Binding="{Binding WindowClassName}"
-					EditingElementStyle="{StaticResource TextBoxCell}"
-					ElementStyle="{StaticResource TextBlockCell}"
-					Header="Window Class" />
-				<DataGridTextColumn
 					x:Name="ProcessPathColumn"
 					Width="Auto"
 					x:FieldModifier="public"
@@ -294,6 +288,12 @@
 						</MultiBinding>
 					</DataGridTextColumn.Binding>
 				</DataGridTextColumn>
+				<DataGridTextColumn
+					x:Name="WindowClassNameColumn"
+					Binding="{Binding WindowClassName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Window Class" />
 			</DataGrid.Columns>
 			<DataGrid.CellStyle>
 				<Style TargetType="DataGridCell">
