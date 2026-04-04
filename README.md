@@ -21,5 +21,5 @@ Digitally Signed Application v1.2.6.0 (2026-04-04)
 
 ## Screenshots
 
-<img alt="Main From" src="FocusLogger/Documents/Images/JocysCom.FocusLogger.png" width="700" height="480">
+<img alt="Main From" src="Documents/Images/JocysCom.FocusLogger.png" width="700" height="480">
 
