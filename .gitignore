@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 /FocusLogger/Resources/BuildDate.txt
 /FocusLogger/Documents/Files
+/.claude/settings.local.json
+Documents/Files
