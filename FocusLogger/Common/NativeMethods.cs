@@ -143,6 +143,16 @@ namespace JocysCom.FocusLogger
 			return null;
 		}
 
+		[DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+		internal static string GetWindowClassName(IntPtr hWnd)
+		{
+			var sb = new StringBuilder(256);
+			var length = GetClassName(hWnd, sb, sb.Capacity);
+			return length > 0 ? sb.ToString() : "";
+		}
+
 		internal static string GetWindowText(IntPtr hWnd)
 		{
 			int textLength = GetWindowTextLengthW(hWnd);

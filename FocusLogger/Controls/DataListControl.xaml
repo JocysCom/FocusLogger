@@ -274,6 +274,12 @@
 					ElementStyle="{StaticResource TextBlockCell}"
 					Header="Window Title" />
 				<DataGridTextColumn
+					x:Name="WindowClassNameColumn"
+					Binding="{Binding WindowClassName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Window Class" />
+				<DataGridTextColumn
 					x:Name="ProcessPathColumn"
 					Width="Auto"
 					x:FieldModifier="public"

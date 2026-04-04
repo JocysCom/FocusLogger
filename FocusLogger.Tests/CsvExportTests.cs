@@ -57,6 +57,7 @@ namespace JocysCom.FocusLogger.Tests
 					HasKeyboard = true,
 					HasCaret = true,
 					WindowTitle = "Untitled - Notepad",
+					WindowClassName = "Notepad",
 					ProcessPath = @"C:\Windows\notepad.exe",
 				},
 				new DataItem
@@ -69,13 +70,14 @@ namespace JocysCom.FocusLogger.Tests
 					HasKeyboard = false,
 					HasCaret = false,
 					WindowTitle = "File, \"Explorer\"",
+					WindowClassName = "CabinetWClass",
 					ProcessPath = @"C:\Windows\explorer.exe",
 				},
 			};
 			var csv = DataListControl.BuildCsvContent(items);
 			var lines = csv.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 			// Header + 2 data rows + trailing empty line.
-			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Path", lines[0]);
+			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
 			Assert.AreEqual(4, lines.Length);
 			// Verify comma/quote in WindowTitle is escaped.
 			Assert.IsTrue(lines[2].Contains("\"File, \"\"Explorer\"\"\""));
@@ -87,7 +89,7 @@ namespace JocysCom.FocusLogger.Tests
 			var csv = DataListControl.BuildCsvContent(Array.Empty<DataItem>());
 			var lines = csv.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 			Assert.AreEqual(1, lines.Length);
-			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Path", lines[0]);
+			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
 		}
 	}
 }

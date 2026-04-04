@@ -119,7 +119,7 @@ namespace JocysCom.FocusLogger.Controls
 		public static string BuildCsvContent(System.Collections.Generic.IEnumerable<DataItem> items)
 		{
 			var sb = new StringBuilder();
-			sb.AppendLine("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Path");
+			sb.AppendLine("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path");
 			foreach (var item in items)
 			{
 				sb.AppendLine(string.Join(",",
@@ -131,6 +131,7 @@ namespace JocysCom.FocusLogger.Controls
 					item.HasKeyboard,
 					item.HasCaret,
 					CsvEscape(item.WindowTitle),
+					CsvEscape(item.WindowClassName),
 					CsvEscape(item.ProcessPath)
 				));
 			}
@@ -280,6 +281,7 @@ namespace JocysCom.FocusLogger.Controls
 				hWnd = NativeMethods.GetTopWindow(hWnd);
 			}
 			item.WindowTitle = NativeMethods.GetWindowText(hWnd);
+			item.WindowClassName = NativeMethods.GetWindowClassName(hWnd);
 			NativeMethods.GetWindowThreadProcessId(hWnd, out processId);
 			item.ProcessId = processId;
 			return item;
