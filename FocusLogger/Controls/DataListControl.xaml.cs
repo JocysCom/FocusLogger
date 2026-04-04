@@ -1,11 +1,14 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
 using JocysCom.FocusLogger.Resources.Icons;
+using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -79,6 +82,76 @@ namespace JocysCom.FocusLogger.Controls
 			if (ControlsHelper.IsDesignMode(this))
 				return;
 			InitTimer();
+		}
+
+		private string _lastSavedCsvPath;
+
+		private void SaveCsvButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (DataItems.Count == 0)
+			{
+				MessageBox.Show("No log entries to save.", "Save CSV", MessageBoxButton.OK, MessageBoxImage.Information);
+				return;
+			}
+			var dialog = new SaveFileDialog
+			{
+				Filter = "CSV files (*.csv)|*.csv",
+				DefaultExt = ".csv",
+				FileName = $"FocusLog_{DateTime.Now:yyyy-MM-dd_HHmmss}.csv",
+			};
+			if (dialog.ShowDialog() != true)
+				return;
+			var csv = BuildCsvContent(DataItems);
+			File.WriteAllText(dialog.FileName, csv, Encoding.UTF8);
+			_lastSavedCsvPath = dialog.FileName;
+		}
+
+		private void ExploreCsvButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (string.IsNullOrEmpty(_lastSavedCsvPath) || !File.Exists(_lastSavedCsvPath))
+			{
+				MessageBox.Show("No CSV file saved yet. Use 'Save CSV' first.", "Explore", MessageBoxButton.OK, MessageBoxImage.Information);
+				return;
+			}
+			Process.Start("explorer.exe", $"/select,\"{_lastSavedCsvPath}\"");
+		}
+
+		public static string BuildCsvContent(System.Collections.Generic.IEnumerable<DataItem> items)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Path");
+			foreach (var item in items)
+			{
+				sb.AppendLine(string.Join(",",
+					CsvEscape(item.Date.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+					item.ProcessId,
+					CsvEscape(item.ProcessName),
+					item.IsActive,
+					item.HasMouse,
+					item.HasKeyboard,
+					item.HasCaret,
+					CsvEscape(item.WindowTitle),
+					CsvEscape(item.ProcessPath)
+				));
+			}
+			return sb.ToString();
+		}
+
+		public static string CsvEscape(string value)
+		{
+			if (string.IsNullOrEmpty(value))
+				return "";
+			if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+				return "\"" + value.Replace("\"", "\"\"") + "\"";
+			return value;
+		}
+
+		private void CopyAiPromptButton_Click(object sender, RoutedEventArgs e)
+		{
+			var prompt = ClassLibrary.Helper.FindResource<string>("Resources/AiAnalysisPrompt.md").TrimEnd();
+			var box = new MessageBoxWindow();
+			box.SetSize(600, 400);
+			box.ShowPrompt(prompt, "AI Analysis Prompt - Copy and paste into your AI assistant", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
 		}
 
 		private void ClearButton_Click(object sender, RoutedEventArgs e)

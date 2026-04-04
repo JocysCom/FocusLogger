@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
 	x:Class=" JocysCom.FocusLogger.Controls.DataListControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -21,14 +21,54 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<ToolBarPanel
+		<StackPanel
 			Grid.Row="0"
-			HorizontalAlignment="Right"
-			Style="{StaticResource MainToolBarPanel}">
+			Margin="3,3,0,0"
+			HorizontalAlignment="Left"
+			Orientation="Horizontal">
+			<Button
+				Name="SaveCsvButton"
+				Margin="2"
+				Padding="3,0,3,0"
+				AutomationProperties.AutomationId="SaveCsvButton"
+				Background="Transparent"
+				Click="SaveCsvButton_Click">
+				<StackPanel Style="{StaticResource ButtonStackPanel}">
+					<ContentControl Content="{StaticResource Icon_Save}" Focusable="False" />
+					<Label Content="Save CSV" Style="{StaticResource ButtonLabel}" />
+				</StackPanel>
+			</Button>
+			<Button
+				Name="ExploreCsvButton"
+				Margin="2"
+				Padding="3,0,3,0"
+				AutomationProperties.AutomationId="ExploreCsvButton"
+				Background="Transparent"
+				Click="ExploreCsvButton_Click">
+				<StackPanel Style="{StaticResource ButtonStackPanel}">
+					<ContentControl Content="{StaticResource Icon_FolderOpen}" Focusable="False" />
+					<Label Content="Explore" Style="{StaticResource ButtonLabel}" />
+				</StackPanel>
+			</Button>
+			<Button
+				Name="CopyAiPromptButton"
+				Margin="2"
+				Padding="3,0,3,0"
+				AutomationProperties.AutomationId="CopyAiPromptButton"
+				Background="Transparent"
+				Click="CopyAiPromptButton_Click">
+				<StackPanel Style="{StaticResource ButtonStackPanel}">
+					<ContentControl Content="{StaticResource Icon_list}" Focusable="False" />
+					<Label Content="AI Prompt Example" Style="{StaticResource ButtonLabel}" />
+				</StackPanel>
+			</Button>
+		</StackPanel>
+		<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
 			<Button
 				Name="ClearButton"
 				Margin="2"
 				Padding="3,0,3,0"
+				AutomationProperties.AutomationId="ClearButton"
 				Background="Transparent"
 				Click="ClearButton_Click">
 				<StackPanel Style="{StaticResource ButtonStackPanel}">
@@ -36,7 +76,6 @@
 					<Label Content="Clear" Style="{StaticResource ButtonLabel}" />
 				</StackPanel>
 			</Button>
-
 		</ToolBarPanel>
 		<DataGrid
 			x:Name="MainDataGrid"
@@ -45,6 +84,7 @@
 			VerticalAlignment="Stretch"
 			x:FieldModifier="public"
 			AutoGenerateColumns="False"
+			AutomationProperties.AutomationId="MainDataGrid"
 			Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
 			BorderThickness="0"
 			IsReadOnly="True"
@@ -88,17 +128,11 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock
-							HorizontalAlignment="Center"
-							Text="A"
-							ToolTip="Window is Active" />
+						<TextBlock HorizontalAlignment="Center" Text="A" ToolTip="Window is Active" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<ContentControl
-								x:Name="IsActiveIcon"
-								Width="12"
-								Height="12">
+							<ContentControl x:Name="IsActiveIcon" Width="12" Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -130,17 +164,11 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock
-							HorizontalAlignment="Center"
-							Text="M"
-							ToolTip="Window has Mouse" />
+						<TextBlock HorizontalAlignment="Center" Text="M" ToolTip="Window has Mouse" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<ContentControl
-								x:Name="HasMouseIcon"
-								Width="12"
-								Height="12">
+							<ContentControl x:Name="HasMouseIcon" Width="12" Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -176,10 +204,7 @@
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<ContentControl
-								x:Name="HasKeyboardIcon"
-								Width="12"
-								Height="12">
+							<ContentControl x:Name="HasKeyboardIcon" Width="12" Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />
@@ -211,17 +236,11 @@
 					CanUserResize="False"
 					IsReadOnly="True">
 					<DataGridTemplateColumn.Header>
-						<TextBlock
-							HorizontalAlignment="Center"
-							Text="C"
-							ToolTip="Window has Caret" />
+						<TextBlock HorizontalAlignment="Center" Text="C" ToolTip="Window has Caret" />
 					</DataGridTemplateColumn.Header>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<ContentControl
-								x:Name="HasCaretIcon"
-								Width="12"
-								Height="12">
+							<ContentControl x:Name="HasCaretIcon" Width="12" Height="12">
 								<ContentControl.Content>
 									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 										<Binding RelativeSource="{RelativeSource Self}" />

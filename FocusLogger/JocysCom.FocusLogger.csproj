@@ -29,6 +29,7 @@
   <ItemGroup>
     <None Remove="App.ico" />
     <None Remove="Resources\BuildDate.txt" />
+    <None Remove="Resources\AiAnalysisPrompt.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +38,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\BuildDate.txt" />
+    <EmbeddedResource Include="Resources\AiAnalysisPrompt.md" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
