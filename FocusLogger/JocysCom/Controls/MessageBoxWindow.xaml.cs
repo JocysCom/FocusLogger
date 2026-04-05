@@ -234,7 +234,7 @@ namespace JocysCom.ClassLibrary.Controls
 			}
 		}
 
-		private void CopyButton_Click(object sender, RoutedEventArgs e)
+		private void CopyMessage_Click(object sender, RoutedEventArgs e)
 		{
 			var text = MessageTextBox.Visibility == Visibility.Visible
 				? MessageTextBox.Text

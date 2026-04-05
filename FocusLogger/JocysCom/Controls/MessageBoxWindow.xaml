@@ -50,7 +50,13 @@
 					VerticalAlignment="Top"
 					Text="Message"
 					TextWrapping="Wrap"
-					Visibility="Collapsed" />
+					Visibility="Collapsed">
+					<TextBlock.ContextMenu>
+						<ContextMenu>
+							<MenuItem Click="CopyMessage_Click" Header="Copy" />
+						</ContextMenu>
+					</TextBlock.ContextMenu>
+				</TextBlock>
 				<TextBox
 					x:Name="MessageTextBox"
 					Margin="0,8,8,8"
@@ -88,16 +94,6 @@
 				Margin="8,8,8,8"
 				HorizontalAlignment="Right"
 				Orientation="Horizontal">
-				<Button
-					Name="CopyButton"
-					Margin="0,0,8,0"
-					Click="CopyButton_Click"
-					ToolTip="Copy message to clipboard">
-					<StackPanel>
-						<ContentControl Name="CopyButtonContent" Content="{StaticResource Icon_Export}" />
-						<Label Name="CopyButtonLabel" Content="Copy" />
-					</StackPanel>
-				</Button>
 				<Button Name="Button1" Margin="0,0,0,0" Click="Button_Click">
 					<StackPanel>
 						<ContentControl Name="Button1Content" Content="{StaticResource Icon_OK}" />
