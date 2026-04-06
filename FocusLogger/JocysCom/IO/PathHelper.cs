@@ -102,10 +102,10 @@ namespace JocysCom.ClassLibrary.IO
 			if (System.IO.Path.IsPathRooted(path))
 				return path;
 			// Combine path.
-#if NETCOREAPP
-			var combined = System.IO.Path.GetFullPath(path, relativeTo);
-#else
+#if NETFRAMEWORK
 			var combined = System.IO.Path.Combine(relativeTo, path);
+#else
+			var combined = System.IO.Path.GetFullPath(path, relativeTo);
 #endif
 			// Fix dot notations.
 			combined = Path.GetFullPath(combined);

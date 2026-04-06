@@ -192,14 +192,11 @@ namespace JocysCom.ClassLibrary.Controls
 
 		private static void MessageBoxShow(string message)
 		{
-#if NETCOREAPP // .NET Core
-			System.Windows.MessageBox.Show(message);
-#elif NETSTANDARD // .NET Standard
-#elif NETFRAMEWORK // .NET Framework
+#if NETFRAMEWORK // .NET Framework
 			// Requires: PresentationFramework.dll
 			System.Windows.MessageBox.Show(message);
 #else
-			throw new NotImplementedException("MessageBox not available for this .NET type");
+			System.Windows.MessageBox.Show(message);
 #endif
 		}
 
@@ -246,14 +243,7 @@ namespace JocysCom.ClassLibrary.Controls
 				return null;
 			var t = item.GetType();
 			PropertyInfo pi = null;
-#if NETCOREAPP // .NET Core
-			// Try to find property by KeyAttribute.
-			pi = t.GetProperties()
-				.Where(x => Attribute.IsDefined(x, typeof(System.ComponentModel.DataAnnotations.KeyAttribute), true))
-				.FirstOrDefault();
-			if (pi != null)
-				return pi;
-#else
+#if NETFRAMEWORK
 			// Try to find property by EntityFramework EdmScalarPropertyAttribute (System.Data.Entity.dll).
 			pi = t.GetProperties()
 				.Where(x =>
@@ -263,7 +253,13 @@ namespace JocysCom.ClassLibrary.Controls
 				.FirstOrDefault();
 			if (pi != null)
 				return pi;
-
+#else
+			// Try to find property by KeyAttribute.
+			pi = t.GetProperties()
+				.Where(x => Attribute.IsDefined(x, typeof(System.ComponentModel.DataAnnotations.KeyAttribute), true))
+				.FirstOrDefault();
+			if (pi != null)
+				return pi;
 #endif
 			return null;
 		}

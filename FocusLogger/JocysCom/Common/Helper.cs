@@ -153,9 +153,7 @@ namespace JocysCom.ClassLibrary
 				var streamReader = new StreamReader(stream, true);
 				return (T)(object)streamReader.ReadToEnd();
 			}
-#if NETCOREAPP // .NET Core
-#elif NETSTANDARD // .NET Standard
-#else // .NET Framework
+#if NETFRAMEWORK // .NET Framework
 			else if (typeof(T) == typeof(System.Drawing.Image) || typeof(T) == typeof(System.Drawing.Bitmap))
 			{
 				return (T)(object)System.Drawing.Image.FromStream(stream);
@@ -379,9 +377,7 @@ namespace JocysCom.ClassLibrary
 
 		#endregion
 
-#if NETCOREAPP // .NET Core
-#elif NETSTANDARD // .NET Standard
-#else // .NET Framework
+#if NETFRAMEWORK // .NET Framework
 
 		#region Disk Activity
 
@@ -554,9 +550,7 @@ namespace JocysCom.ClassLibrary
 			if (disposing)
 			{
 
-#if NETCOREAPP // .NET Core
-#elif NETSTANDARD // .NET Standard
-#else // .NET Framework
+#if NETFRAMEWORK // .NET Framework
 
 				// Free managed resources.
 				if (_diskReadCounter != null)

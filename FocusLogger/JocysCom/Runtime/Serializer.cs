@@ -83,6 +83,7 @@ namespace JocysCom.ClassLibrary.Runtime
 
 		#region JSON
 
+#if NETFRAMEWORK
 		/// <summary>Cache data for speed.</summary>
 		/// <remarks>Cache allows for this class to work 20 times faster.</remarks>
 		private static ConcurrentDictionary<Type, DataContractJsonSerializer> JsonSerializers = new ConcurrentDictionary<Type, DataContractJsonSerializer>();
@@ -93,27 +94,16 @@ namespace JocysCom.ClassLibrary.Runtime
 				return null;
 			return JsonSerializers.GetOrAdd(type, x => new DataContractJsonSerializer(type, settings));
 		}
-
-		// DataContractJsonSerializerSettings requires .NET 4.5
-		static DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings()
-		{
-			IgnoreExtensionDataObject = true,
-			// Simple dictionary format looks like this: { "Key1": "Value1", "Key2": "Value2" }
-			UseSimpleDictionaryFormat = true,
-		};
+#endif
 
 		public static Func<object, Encoding, string> _SerializeToJson;
 		public static Func<string, Type, Encoding, object> _DeserializeFromJson;
 
-#if NETCOREAPP
+#if !NETFRAMEWORK
 		private static System.Text.Json.JsonSerializerOptions GetJsonOptions()
 		{
 			var options = new System.Text.Json.JsonSerializerOptions();
-#if NETCOREAPP2_1 || NETCOREAPP3_0 || NETCOREAPP3_1
-			options.IgnoreNullValues = true;
-#else
 			options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-#endif
 			options.PropertyNamingPolicy = null;
 			options.WriteIndented = true;
 			options.MaxDepth = 64;
@@ -135,11 +125,7 @@ namespace JocysCom.ClassLibrary.Runtime
 				return _SerializeToJson(o, encoding);
 			if (o is null)
 				return null;
-#if NETCOREAPP
-			var options = GetJsonOptions();
-			var json = System.Text.Json.JsonSerializer.Serialize(o, o.GetType(), options);
-			return json;
-#else
+#if NETFRAMEWORK
 			var serializer = GetJsonSerializer(o.GetType());
 			var ms = new MemoryStream();
 			lock (serializer) { serializer.WriteObject(ms, o); }
@@ -147,6 +133,10 @@ namespace JocysCom.ClassLibrary.Runtime
 				encoding = Encoding.UTF8;
 			var json = encoding.GetString(ms.ToArray());
 			ms.Close();
+			return json;
+#else
+			var options = GetJsonOptions();
+			var json = System.Text.Json.JsonSerializer.Serialize(o, o.GetType(), options);
 			return json;
 #endif
 		}
@@ -164,11 +154,7 @@ namespace JocysCom.ClassLibrary.Runtime
 				return _DeserializeFromJson(json, type, encoding);
 			if (json is null)
 				return null;
-#if NETCOREAPP
-			var options = GetJsonOptions();
-			var o = System.Text.Json.JsonSerializer.Deserialize(json, type, options);
-			return o;
-#else
+#if NETFRAMEWORK
 			var serializer = GetJsonSerializer(type);
 			if (encoding is null)
 				encoding = Encoding.UTF8;
@@ -177,6 +163,10 @@ namespace JocysCom.ClassLibrary.Runtime
 			object o;
 			lock (serializer) { o = serializer.ReadObject(ms); }
 			ms.Close();
+			return o;
+#else
+			var options = GetJsonOptions();
+			var o = System.Text.Json.JsonSerializer.Deserialize(json, type, options);
 			return o;
 #endif
 		}

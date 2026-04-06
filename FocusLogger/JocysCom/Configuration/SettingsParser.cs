@@ -1,12 +1,6 @@
 using System;
 using System.Linq;
-#if NETCOREAPP // .NET Core
-#elif NETSTANDARD // .NET Standard
-using System.Globalization;
-using System.Net;
-using System.Collections.Generic;
-using System.IO;
-#else // .NET Framework...
+#if NETFRAMEWORK // .NET Framework...
 using System.Configuration;
 #endif
 #if __MOBILE__
@@ -103,79 +97,16 @@ namespace JocysCom.ClassLibrary.Configuration
             return (T)ParseValue(typeof(T), v, defaultValue);
         }
 
-#if NETSTANDARD // If .NET Standard (Xamarin) preprocessor directive is set then...
-
-        /// <summary>
-        /// Gets the raw configuration value for .NET Standard, using <c>_GetValue</c> or Xamarin properties with embedded-settings fallback.
-        /// </summary>
-        /// <param name="name">Setting key without prefix.</param>
-        /// <returns>Raw string value or null if not found.</returns>
-        string GetValue(string name)
-        {
-            if (_GetValue != null)
-                return _GetValue(ConfigPrefix + name);
-#if __MOBILE__
-
-            var p = Application.Current.Properties;
-            var key = ConfigPrefix + name;
-            if (!p.Keys.Contains(key))
-            {
-                if (EmbeddedAppSettings is null)
-                    ReadEmbeddedSettings();
-                if (EmbeddedAppSettings.Keys.Contains(key))
-                    return EmbeddedAppSettings[key];
-                return null;
-            }
-            return (string)p[key];
-#else
-            return null;
-#endif
-        }
-
-#if __MOBILE__
-
-        /// <summary>Dictionary storing embedded appSettings loaded from App.config resource in Xamarin.</summary>
-        public static Dictionary<string, string> EmbeddedAppSettings;
-
-        /// <summary>Loads and parses embedded App.config resource into <see cref="EmbeddedAppSettings"/>.</summary>
-        /// <remarks>Looks for a resource ending with App.config, parses its appSettings section, and populates <see cref="EmbeddedAppSettings"/>.</remarks>
-        public static void ReadEmbeddedSettings()
-        {
-            EmbeddedAppSettings = new Dictionary<string, string>();
-            var assembly = typeof(SettingsParser).Assembly;
-            var names = assembly.GetManifestResourceNames();
-            var name = names.FirstOrDefault(x => x.EndsWith("App.config"));
-            if (string.IsNullOrEmpty(name))
-                return;
-            var stream = assembly.GetManifestResourceStream(name);
-            using (var reader = new StreamReader(stream))
-            {
-                var doc = XDocument.Parse(reader.ReadToEnd());
-                var items = doc
-                    .Element("configuration")
-                    .Element("appSettings")
-                    .Elements("add").ToList();
-                foreach (var item in items)
-                {
-                    var k = item.Attribute("key").Value;
-                    var v = item.Attribute("value").Value;
-                    EmbeddedAppSettings.Add(k, v);
-                }
-            }
-        }
-
-#endif
-
-#elif NETCOREAPP // if .NET Core preprocessor directive is set then...
-
-        /// <summary>Delegate to fetch configuration values by key; initialize via InitializeParser in .NET Core.</summary>
-        public static Func<string, string> _GetValue;
-
-#else // NETFRAMEWORK - .NET Framework...
+#if NETFRAMEWORK // .NET Framework...
 
         /// <summary>Delegate to fetch configuration values by key; defaults to ConfigurationManager.AppSettings in .NET Framework.</summary>
         public static Func<string, string> _GetValue = (name)
             => ConfigurationManager.AppSettings[name];
+
+#else // .NET (Core/5+)
+
+        /// <summary>Delegate to fetch configuration values by key; initialize via InitializeParser in .NET Core.</summary>
+        public static Func<string, string> _GetValue;
 
 #endif
 
