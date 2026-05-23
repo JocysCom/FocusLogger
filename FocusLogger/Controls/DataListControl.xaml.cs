@@ -119,11 +119,12 @@ namespace JocysCom.FocusLogger.Controls
 		public static string BuildCsvContent(System.Collections.Generic.IEnumerable<DataItem> items)
 		{
 			var sb = new StringBuilder();
-			sb.AppendLine("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path");
+			sb.AppendLine("Date,Duration (ms),PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path");
 			foreach (var item in items)
 			{
 				sb.AppendLine(string.Join(",",
 					CsvEscape(item.Date.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+					item.Duration,
 					item.ProcessId,
 					CsvEscape(item.ProcessName),
 					item.IsActive,
@@ -248,7 +249,12 @@ namespace JocysCom.FocusLogger.Controls
 				{
 					oldActiveItem = activeItem;
 					UpdateFromProcess(activeItem);
-					ControlsHelper.BeginInvoke(() => DataItems.Insert(0, activeItem));
+					ControlsHelper.BeginInvoke(() =>
+					{
+						if (DataItems.Count > 0)
+							DataItems[0].Duration = (long)(activeItem.Date - DataItems[0].Date).TotalMilliseconds;
+						DataItems.Insert(0, activeItem);
+					});
 				}
 				// Get foreground window.
 				var foregroundHandle = NativeMethods.GetForegroundWindow();
@@ -258,7 +264,12 @@ namespace JocysCom.FocusLogger.Controls
 				{
 					oldForegroundItem = foregroundItem;
 					UpdateFromProcess(foregroundItem);
-					ControlsHelper.BeginInvoke(() => DataItems.Insert(0, foregroundItem));
+					ControlsHelper.BeginInvoke(() =>
+					{
+						if (DataItems.Count > 0)
+							DataItems[0].Duration = (long)(foregroundItem.Date - DataItems[0].Date).TotalMilliseconds;
+						DataItems.Insert(0, foregroundItem);
+					});
 				}
 			}
 		}

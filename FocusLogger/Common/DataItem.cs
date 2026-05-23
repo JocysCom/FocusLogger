@@ -11,6 +11,9 @@ namespace JocysCom.FocusLogger
 		public DateTime Date { get => _Date; set => SetProperty(ref _Date, value); }
 		DateTime _Date;
 
+		public long Duration { get => _Duration; set => SetProperty(ref _Duration, value); }
+		long _Duration;
+
 		public int ProcessId { get => _ProcessId; set => SetProperty(ref _ProcessId, value); }
 		int _ProcessId;
 
