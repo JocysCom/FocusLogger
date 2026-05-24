@@ -51,6 +51,93 @@ def invoke_azdo(url, method, headers, body=None, use_default_creds=False):
     return None
 
 
+def invoke_github(url, method, token, body=None):
+    """Make a GitHub REST API call (PR comments live under the issue-comments endpoint)."""
+    import requests
+
+    print(f"{method} {url}")
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    kwargs = {"headers": headers}
+    if body is not None:
+        headers["Content-Type"] = "application/json"
+        kwargs["data"] = json.dumps(body) if isinstance(body, dict) else body
+
+    response = requests.request(method, url, **kwargs)
+    response.raise_for_status()
+    if response.content:
+        return response.json()
+    return None
+
+
+def post_github_review_comment(config, review_content, dry_run):
+    """Post (or update) the AI review comment on a GitHub PR.
+
+    GitHub PR comments are issue comments — same endpoint shape, just keyed
+    by the PR number. There is no thread-status / resolved concept for plain
+    issue comments (formal approval lives under the reviews API, which we do
+    not use here — the comment text already carries the verdict).
+    """
+    token = os.environ.get("GITHUB_PAT") or os.environ.get("GITHUB_TOKEN")
+    if not token:
+        print("ERROR: GITHUB_PAT (or GITHUB_TOKEN) env var required for GitHub comment posting",
+              file=sys.stderr)
+        sys.exit(1)
+
+    owner = config["OrganizationName"]
+    repo = config["RepoName"]
+    pr_number = config["PullRequestId"]
+    api_base = f"https://api.github.com/repos/{owner}/{repo}"
+    comments_url = f"{api_base}/issues/{pr_number}/comments"
+
+    print_info(comments_url, "Comments URL")
+    print()
+
+    if dry_run:
+        print("[DRY RUN] Would post/update review comment to GitHub")
+        print(f"  Content length: {len(review_content)} chars")
+        return
+
+    # Find existing AI review comment by marker (matches the Azure path's
+    # detection — both header constants must stay in lock-step).
+    matching = None
+    page = 1
+    while True:
+        page_url = f"{comments_url}?per_page=100&page={page}"
+        comments = invoke_github(page_url, "GET", token) or []
+        for c in comments:
+            body = c.get("body") or ""
+            if "**\U0001f916 AI-Assisted Review**" in body and "# AI Review report" in body:
+                matching = c
+                break
+        if matching or len(comments) < 100:
+            break
+        page += 1
+
+    if matching:
+        comment_id = matching["id"]
+        update_url = f"{api_base}/issues/comments/{comment_id}"
+        print(f"Existing AI review comment found (ID: {comment_id}), updating...")
+        invoke_github(update_url, "PATCH", token, body={"body": review_content})
+        print_success("Comment updated")
+        print_info(str(comment_id), "Comment ID")
+    else:
+        print("No existing AI review comment found, creating new...")
+        response = invoke_github(comments_url, "POST", token, body={"body": review_content})
+        print_success("Review comment posted")
+        if response:
+            print_info(str(response.get("id", "")), "Comment ID")
+
+    pr_web_url = f"https://github.com/{owner}/{repo}/pull/{pr_number}"
+    print()
+    print_info(pr_web_url, "View PR")
+    print()
+    print_header("Comment Posted/Updated")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Post review comment to Azure DevOps PR.")
     parser.add_argument("--config", dest="config_path", help="Path to pr-review.json")
@@ -159,7 +246,9 @@ def main():
     )
     review_content = header + review_content
 
-    # Parse review to detect approval status
+    # Parse review to detect approval status (used by Azure DevOps to set
+    # the thread to "closed" on approval; GitHub has no equivalent on
+    # plain issue comments, so the path branches on provider here).
     thread_status = "active"
     if re.search(r"##\s*Decision\s*\n[^\n]*\u2705\s*Approve", review_content):
         thread_status = "closed"
@@ -167,7 +256,16 @@ def main():
     else:
         print("Review requests changes - thread will remain active")
 
-    # Build API URL
+    # Provider switch. The Azure DevOps path constructs an Azure-shaped
+    # threads URL under {BaseUrl}/{Org}/{Project}/_apis/git/repositories/...
+    # which 404s when applied to a GitHub PR. For GitHub, post under the
+    # issue-comments endpoint of the github.com API.
+    provider = (config.get("Provider") or "").strip().lower()
+    if provider == "github":
+        post_github_review_comment(config, review_content, args.dry_run)
+        return
+
+    # Build API URL (Azure DevOps)
     api_base = (f"{config['BaseUrl']}/{config['OrganizationName']}"
                 f"/{config['ProjectName']}/_apis")
     threads_uri = (f"{api_base}/git/repositories/{config['RepoName']}"
