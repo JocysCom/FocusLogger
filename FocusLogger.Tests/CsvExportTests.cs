@@ -50,6 +50,7 @@ namespace JocysCom.FocusLogger.Tests
 				new DataItem
 				{
 					Date = new DateTime(2026, 4, 4, 10, 30, 0, 123),
+					Duration = 1333,
 					ProcessId = 1234,
 					ProcessName = "notepad",
 					IsActive = true,
@@ -63,6 +64,7 @@ namespace JocysCom.FocusLogger.Tests
 				new DataItem
 				{
 					Date = new DateTime(2026, 4, 4, 10, 30, 1, 456),
+					Duration = 0,
 					ProcessId = 5678,
 					ProcessName = "explorer",
 					IsActive = false,
@@ -77,8 +79,11 @@ namespace JocysCom.FocusLogger.Tests
 			var csv = DataListControl.BuildCsvContent(items);
 			var lines = csv.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 			// Header + 2 data rows + trailing empty line.
-			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
+			Assert.AreEqual("Date,Duration (ms),PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
 			Assert.AreEqual(4, lines.Length);
+			// Verify Duration appears at position 2 (second field) in each data row.
+			Assert.AreEqual("1333", lines[1].Split(',')[1]);
+			Assert.AreEqual("0", lines[2].Split(',')[1]);
 			// Verify comma/quote in WindowTitle is escaped.
 			Assert.IsTrue(lines[2].Contains("\"File, \"\"Explorer\"\"\""));
 		}
@@ -89,7 +94,42 @@ namespace JocysCom.FocusLogger.Tests
 			var csv = DataListControl.BuildCsvContent(Array.Empty<DataItem>());
 			var lines = csv.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 			Assert.AreEqual(1, lines.Length);
-			Assert.AreEqual("Date,PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
+			Assert.AreEqual("Date,Duration (ms),PID,Process Name,Active,Mouse,Keyboard,Caret,Window Title,Window Class,Path", lines[0]);
+		}
+
+		[TestMethod]
+		public void BuildCsvContent_Duration_IsRenderedInDataRow()
+		{
+			var items = new[]
+			{
+				new DataItem
+				{
+					Date = new DateTime(2026, 4, 4, 10, 30, 0, 0),
+					Duration = 250,
+					ProcessId = 1,
+					ProcessName = "a",
+					WindowTitle = "t1",
+					WindowClassName = "c1",
+					ProcessPath = "p1",
+				},
+				new DataItem
+				{
+					Date = new DateTime(2026, 4, 4, 10, 30, 0, 500),
+					Duration = 42,
+					ProcessId = 2,
+					ProcessName = "b",
+					WindowTitle = "t2",
+					WindowClassName = "c2",
+					ProcessPath = "p2",
+				},
+			};
+			var csv = DataListControl.BuildCsvContent(items);
+			var lines = csv.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+			// Header + 2 data rows = 3 lines.
+			Assert.AreEqual(3, lines.Length);
+			// Duration must appear as the 2nd field (index 1) in each data row.
+			Assert.AreEqual("250", lines[1].Split(',')[1]);
+			Assert.AreEqual("42", lines[2].Split(',')[1]);
 		}
 	}
 }

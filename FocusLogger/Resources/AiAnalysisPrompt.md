@@ -1,5 +1,5 @@
 I have a Focus Logger CSV file that records which Windows process or program takes window focus.
-Each row contains: Date, PID, Process Name, Active, Mouse, Keyboard, Caret, Window Title, Window Class, and Path.
+Each row contains: Date, Duration (ms), PID, Process Name, Active, Mouse, Keyboard, Caret, Window Title, Window Class, and Path. The "Duration (ms)" column is how long that focus state lasted before the next change — short durations (e.g. < 200 ms) often indicate a transient focus stealer such as a tooltip or notification.
 
 The "Window Class" column contains the Win32 window class name (e.g., "Shell_TrayWnd" for the taskbar, "tooltips_class32" for tooltip popups, "MSCTFIME UI" for text input framework, "Chrome_WidgetWin_1" for Chromium-based browsers). This helps identify the type of window that took focus.
 

@@ -111,6 +111,12 @@
 					</DataGridTextColumn.Binding>
 				</DataGridTextColumn>
 				<DataGridTextColumn
+					x:Name="DurationColumn"
+					Binding="{Binding Duration}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockRightCell}"
+					Header="Duration (ms)" />
+				<DataGridTextColumn
 					x:Name="ProcessIdColumn"
 					Binding="{Binding ProcessId}"
 					EditingElementStyle="{StaticResource TextBoxCell}"
