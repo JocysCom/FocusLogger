@@ -1,0 +1,7 @@
+requests>=2.28.0
+requests-ntlm>=1.2.0
+# Optional but recommended: s03_extract_attachments.py uses Pillow to read
+# image dimensions, generate thumbnails for oversize images, and extract
+# animated-GIF keyframes. The agent container already ships Pillow; local
+# devs running scripts on Windows should `pip install Pillow` for parity.
+Pillow>=10.0.0

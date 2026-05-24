@@ -1,0 +1,18 @@
+CodePath,Role,ExpectedUiPath,ActualUiPath,ExpectedTestPath,ActualTestPath,Deviation,Notes
+FocusLogger/App.xaml,bootstrap,,,FocusLogger.Tests/AppTests.cs,,test-missing,
+FocusLogger/App.xaml.cs,code-behind,,,FocusLogger.Tests/AppTests.cs,,test-missing,
+FocusLogger/Controls/DataListControl.xaml,ui-view,MainWindow > DataList,,FocusLogger.Tests/Controls/DataListControlTests.cs,,test-missing,AutomationId prefix = DataList.
+FocusLogger/Controls/DataListControl.xaml.cs,code-behind,,,FocusLogger.Tests/Controls/DataListControlTests.cs,,test-missing,
+FocusLogger/JocysCom/Controls/InfoControl.xaml,ui-view,MainWindow > Info,,FocusLogger.Tests/JocysCom/Controls/InfoControlTests.cs,,test-missing,AutomationId prefix = Info.
+FocusLogger/JocysCom/Controls/InfoControl.xaml.cs,code-behind,,,FocusLogger.Tests/JocysCom/Controls/InfoControlTests.cs,,test-missing,
+FocusLogger/JocysCom/Controls/ItemFormattingConverter.cs,converter,,,FocusLogger.Tests/JocysCom/Controls/ItemFormattingConverterTests.cs,,test-missing,
+FocusLogger/JocysCom/Controls/MessageBoxWindow.xaml,ui-view,MainWindow > MessageBox,,FocusLogger.Tests/JocysCom/Controls/MessageBoxWindowTests.cs,,test-missing,AutomationId prefix = MessageBox.
+FocusLogger/JocysCom/Controls/MessageBoxWindow.xaml.cs,code-behind,,,FocusLogger.Tests/JocysCom/Controls/MessageBoxWindowTests.cs,,test-missing,
+FocusLogger/JocysCom/Controls/TabIndexConverter.cs,converter,,,FocusLogger.Tests/JocysCom/Controls/TabIndexConverterTests.cs,,test-missing,
+FocusLogger/JocysCom/Controls/Themes/Default.xaml,resource,,,,,none,
+FocusLogger/JocysCom/Controls/Themes/Icons.xaml,resource,,,,,none,
+FocusLogger/JocysCom/Controls/Themes/Icons.xaml.cs,code-behind,,,FocusLogger.Tests/JocysCom/Controls/Themes/IconsTests.cs,,test-missing,
+FocusLogger/MainWindow.xaml,shell,,,FocusLogger.Tests/MainWindowTests.cs,,test-missing,
+FocusLogger/MainWindow.xaml.cs,code-behind,,,FocusLogger.Tests/MainWindowTests.cs,,test-missing,
+FocusLogger/Resources/Icons/Icons_Default.xaml,resource,,,,,none,
+FocusLogger/Resources/Icons/Icons_Default.xaml.cs,code-behind,,,FocusLogger.Tests/Resources/Icons/Icons_DefaultTests.cs,,test-missing,
