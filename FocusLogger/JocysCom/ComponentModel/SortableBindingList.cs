@@ -53,6 +53,9 @@ namespace JocysCom.ClassLibrary.ComponentModel
 
 		[NonSerialized]
 		private ListSortDescriptionCollection _SortDescriptions = new ListSortDescriptionCollection();
+
+		[NonSerialized]
+		private PropertyComparer<T> _SortComparer = null;
 		private readonly List<T> _OriginalCollection = new List<T>();
 		bool IBindingList.AllowNew => CheckReadOnly();
 		bool IBindingList.AllowRemove => CheckReadOnly();
@@ -99,6 +102,7 @@ namespace JocysCom.ClassLibrary.ComponentModel
 			if (listRef is null)
 				return;
 			listRef.Sort(comparer);
+			_SortComparer = comparer;
 			_Sorted = true;
 			OnListChanged(new ListChangedEventArgs(ListChangedType.Reset, -1));
 		}
@@ -113,6 +117,7 @@ namespace JocysCom.ClassLibrary.ComponentModel
 			_OriginalCollection.Clear();
 			_SortProperty = null;
 			_SortDescriptions = null;
+			_SortComparer = null;
 			_Sorted = false;
 		}
 
@@ -176,7 +181,25 @@ namespace JocysCom.ClassLibrary.ComponentModel
 				if (propDesc.SupportsChangeEvents)
 					propDesc.AddValueChanged(item, OnItemChanged);
 			}
+			// When a sort is active, ignore the caller's index and place the
+			// item at the position that preserves the sort order. Otherwise a
+			// caller doing Insert(0, ...) would always push new items to the
+			// top of the view, regardless of their actual sort value.
+			if (_Sorted && _SortComparer != null)
+			{
+				index = GetSortedInsertIndex(item);
+				_OriginalCollection.Add(item);
+			}
 			base.InsertItem(index, item);
+		}
+
+		private int GetSortedInsertIndex(T item)
+		{
+			var listRef = Items as List<T>;
+			if (listRef is null || listRef.Count == 0)
+				return 0;
+			var foundIndex = listRef.BinarySearch(item, _SortComparer);
+			return foundIndex < 0 ? ~foundIndex : foundIndex;
 		}
 
 		protected override void RemoveItem(int index)
