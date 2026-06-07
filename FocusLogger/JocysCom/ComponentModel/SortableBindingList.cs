@@ -53,6 +53,9 @@ namespace JocysCom.ClassLibrary.ComponentModel
 
 		[NonSerialized]
 		private ListSortDescriptionCollection _SortDescriptions = new ListSortDescriptionCollection();
+
+		[NonSerialized]
+		private PropertyComparer<T> _SortComparer = null;
 		private readonly List<T> _OriginalCollection = new List<T>();
 		bool IBindingList.AllowNew => CheckReadOnly();
 		bool IBindingList.AllowRemove => CheckReadOnly();
@@ -99,6 +102,7 @@ namespace JocysCom.ClassLibrary.ComponentModel
 			if (listRef is null)
 				return;
 			listRef.Sort(comparer);
+			_SortComparer = comparer;
 			_Sorted = true;
 			OnListChanged(new ListChangedEventArgs(ListChangedType.Reset, -1));
 		}
@@ -107,13 +111,19 @@ namespace JocysCom.ClassLibrary.ComponentModel
 		{
 			if (!_Sorted)
 				return;
+			// Clear the sort state BEFORE restoring the original items. Add(...) re-enters
+			// the overridden InsertItem, and while _Sorted is still true that override would
+			// re-sort the item and append it to _OriginalCollection — mutating the very
+			// collection being enumerated here ("Collection was modified"). Mirrors the
+			// already-safe ordering used by RemoveFilter below.
+			_SortProperty = null;
+			_SortDescriptions = null;
+			_SortComparer = null;
+			_Sorted = false;
 			Clear();
 			foreach (var item in _OriginalCollection)
 				Add(item);
 			_OriginalCollection.Clear();
-			_SortProperty = null;
-			_SortDescriptions = null;
-			_Sorted = false;
 		}
 
 		string IBindingListView.Filter { get { return Filter; }  set { Filter = value; }  }
@@ -176,7 +186,25 @@ namespace JocysCom.ClassLibrary.ComponentModel
 				if (propDesc.SupportsChangeEvents)
 					propDesc.AddValueChanged(item, OnItemChanged);
 			}
+			// When a sort is active, ignore the caller's index and place the
+			// item at the position that preserves the sort order. Otherwise a
+			// caller doing Insert(0, ...) would always push new items to the
+			// top of the view, regardless of their actual sort value.
+			if (_Sorted && _SortComparer != null)
+			{
+				index = GetSortedInsertIndex(item);
+				_OriginalCollection.Add(item);
+			}
 			base.InsertItem(index, item);
+		}
+
+		private int GetSortedInsertIndex(T item)
+		{
+			var listRef = Items as List<T>;
+			if (listRef is null || listRef.Count == 0)
+				return 0;
+			var foundIndex = listRef.BinarySearch(item, _SortComparer);
+			return foundIndex < 0 ? ~foundIndex : foundIndex;
 		}
 
 		protected override void RemoveItem(int index)
@@ -188,7 +216,26 @@ namespace JocysCom.ClassLibrary.ComponentModel
 				if (propDesc.SupportsChangeEvents)
 					propDesc.RemoveValueChanged(item, OnItemChanged);
 			}
+			// Mirror InsertItem: while sorted, every item is also tracked in
+			// _OriginalCollection so RemoveSort can restore the pre-sort view. Drop the
+			// removed item from that backing list too, otherwise it would silently
+			// reappear at the bottom as soon as the user clears the sort.
+			if (_Sorted)
+				_OriginalCollection.Remove(item);
 			base.RemoveItem(index);
+		}
+
+		protected override void ClearItems()
+		{
+			// A user-initiated Clear() while sorted must also drop _OriginalCollection,
+			// otherwise every cleared row is resurrected the moment the sort is removed
+			// (RemoveSortCore re-adds from it). Same bug class as RemoveItem above.
+			// The internal Clear() calls inside RemoveSortCore/RemoveFilter are safe:
+			// both set _Sorted = false first, so this guard is false there and the
+			// restore buffer is preserved for re-adding.
+			if (_Sorted)
+				_OriginalCollection.Clear();
+			base.ClearItems();
 		}
 
 		private void OnItemChanged(object sender, EventArgs args)

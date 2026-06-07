@@ -101,7 +101,8 @@
 					Width="Auto"
 					EditingElementStyle="{StaticResource TextBlockCell}"
 					ElementStyle="{StaticResource TextBlockCell}"
-					Header="Date">
+					Header="Date"
+					SortMemberPath="Date">
 					<DataGridTextColumn.Binding>
 						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 							<Binding RelativeSource="{RelativeSource Self}" />
