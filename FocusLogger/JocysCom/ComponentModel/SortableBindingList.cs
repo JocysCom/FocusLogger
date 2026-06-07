@@ -111,14 +111,19 @@ namespace JocysCom.ClassLibrary.ComponentModel
 		{
 			if (!_Sorted)
 				return;
-			Clear();
-			foreach (var item in _OriginalCollection)
-				Add(item);
-			_OriginalCollection.Clear();
+			// Clear the sort state BEFORE restoring the original items. Add(...) re-enters
+			// the overridden InsertItem, and while _Sorted is still true that override would
+			// re-sort the item and append it to _OriginalCollection — mutating the very
+			// collection being enumerated here ("Collection was modified"). Mirrors the
+			// already-safe ordering used by RemoveFilter below.
 			_SortProperty = null;
 			_SortDescriptions = null;
 			_SortComparer = null;
 			_Sorted = false;
+			Clear();
+			foreach (var item in _OriginalCollection)
+				Add(item);
+			_OriginalCollection.Clear();
 		}
 
 		string IBindingListView.Filter { get { return Filter; }  set { Filter = value; }  }
