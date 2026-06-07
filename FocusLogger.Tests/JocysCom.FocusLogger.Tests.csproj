@@ -13,8 +13,4 @@
     <PackageReference Include="MSTest.TestFramework" Version="3.*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FocusLogger\JocysCom.FocusLogger.csproj" />
-  </ItemGroup>
-
 </Project>
