@@ -138,5 +138,44 @@ namespace JocysCom.FocusLogger.Tests
 			Assert.IsTrue(list.Contains(inserted),
 				"Items inserted while sorted must survive RemoveSort.");
 		}
+
+		[TestMethod]
+		public void RemoveSort_AfterSortAndRemove_DropsRemovedItems()
+		{
+			// Symmetric to the insert case above: an item removed while sorted must
+			// not be resurrected from the backing _OriginalCollection when the sort
+			// is cleared. Without the matching RemoveItem fix it reappears.
+			var list = new SortableBindingList<DataItem>
+			{
+				ItemAt(new DateTime(2026, 4, 5, 12, 0, 0, 0)),
+				ItemAt(new DateTime(2026, 4, 4, 12, 0, 0, 0)),
+				ItemAt(new DateTime(2026, 4, 3, 12, 0, 0, 0)),
+			};
+			((IBindingList)list).ApplySort(DateDescriptor(), ListSortDirection.Descending);
+			var removed = list[0];
+			list.Remove(removed);
+			((IBindingList)list).RemoveSort();
+			Assert.IsFalse(list.Contains(removed),
+				"Items removed while sorted must not reappear after RemoveSort.");
+			Assert.AreEqual(2, list.Count);
+		}
+
+		[TestMethod]
+		public void RemoveSort_AfterSortAndClear_DoesNotResurrectClearedItems()
+		{
+			// sort -> Clear -> unsort must yield an empty list. Clear() has to drop the
+			// backing _OriginalCollection too, otherwise RemoveSort re-adds the rows.
+			var list = new SortableBindingList<DataItem>
+			{
+				ItemAt(new DateTime(2026, 4, 5, 12, 0, 0, 0)),
+				ItemAt(new DateTime(2026, 4, 4, 12, 0, 0, 0)),
+				ItemAt(new DateTime(2026, 4, 3, 12, 0, 0, 0)),
+			};
+			((IBindingList)list).ApplySort(DateDescriptor(), ListSortDirection.Descending);
+			list.Clear();
+			((IBindingList)list).RemoveSort();
+			Assert.AreEqual(0, list.Count,
+				"Rows cleared while sorted must not reappear after the sort is removed.");
+		}
 	}
 }

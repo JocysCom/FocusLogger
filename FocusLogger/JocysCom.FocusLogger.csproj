@@ -10,7 +10,7 @@
 	<Product>Focus Logger</Product>
 	<Description>Find out which process or program is taking the window focus. In game, mouse and keyboard could temporarily stop responding if another program takes the focus. This tool could help diagnose which program is stealing the focus.</Description>
 	<ApplicationIcon>App.ico</ApplicationIcon>
-	<Version>1.2.6</Version>
+	<Version>1.2.10</Version>
 	<RepositoryUrl>https://github.com/JocysCom/FocusLogger</RepositoryUrl>
 	<PackageProjectUrl>https://www.jocys.com</PackageProjectUrl>
 	<Copyright>Copyright © Jocys.com 2026</Copyright>

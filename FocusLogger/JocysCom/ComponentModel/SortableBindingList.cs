@@ -216,7 +216,26 @@ namespace JocysCom.ClassLibrary.ComponentModel
 				if (propDesc.SupportsChangeEvents)
 					propDesc.RemoveValueChanged(item, OnItemChanged);
 			}
+			// Mirror InsertItem: while sorted, every item is also tracked in
+			// _OriginalCollection so RemoveSort can restore the pre-sort view. Drop the
+			// removed item from that backing list too, otherwise it would silently
+			// reappear at the bottom as soon as the user clears the sort.
+			if (_Sorted)
+				_OriginalCollection.Remove(item);
 			base.RemoveItem(index);
+		}
+
+		protected override void ClearItems()
+		{
+			// A user-initiated Clear() while sorted must also drop _OriginalCollection,
+			// otherwise every cleared row is resurrected the moment the sort is removed
+			// (RemoveSortCore re-adds from it). Same bug class as RemoveItem above.
+			// The internal Clear() calls inside RemoveSortCore/RemoveFilter are safe:
+			// both set _Sorted = false first, so this guard is false there and the
+			// restore buffer is preserved for re-adding.
+			if (_Sorted)
+				_OriginalCollection.Clear();
+			base.ClearItems();
 		}
 
 		private void OnItemChanged(object sender, EventArgs args)

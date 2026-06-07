@@ -148,6 +148,27 @@ namespace JocysCom.FocusLogger.Controls
 			return value;
 		}
 
+		/// <summary>
+		/// Records a focus change: finalizes the Duration of the previously inserted
+		/// entry (milliseconds it stayed focused, up until <paramref name="current"/>)
+		/// and inserts the new entry at the top of the list. Returns
+		/// <paramref name="current"/> so the caller tracks it as the next "previous".
+		/// </summary>
+		/// <remarks>
+		/// The previous entry is tracked by reference rather than as DataItems[0] so the
+		/// duration stays correct after the user sorts the grid. Sorting reorders the
+		/// collection (ascending by Date moves the oldest row to the top), which
+		/// previously caused that row's Duration to be recomputed from its fixed
+		/// timestamp on every refresh and grow without bound.
+		/// </remarks>
+		public static DataItem RecordFocusChange(SortableBindingList<DataItem> items, DataItem previous, DataItem current)
+		{
+			if (previous != null)
+				previous.Duration = (long)(current.Date - previous.Date).TotalMilliseconds;
+			items.Insert(0, current);
+			return current;
+		}
+
 		private void CopyAiPromptButton_Click(object sender, RoutedEventArgs e)
 		{
 			var prompt = ClassLibrary.Helper.FindResource<string>("Resources/AiAnalysisPrompt.md").TrimEnd();
@@ -159,6 +180,7 @@ namespace JocysCom.FocusLogger.Controls
 		private void ClearButton_Click(object sender, RoutedEventArgs e)
 		{
 			DataItems.Clear();
+			_lastItem = null;
 		}
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -230,6 +252,12 @@ namespace JocysCom.FocusLogger.Controls
 		DataItem oldActiveItem = new DataItem();
 		DataItem oldForegroundItem = new DataItem();
 
+		// Most recently inserted entry. Its Duration is finalized when the next focus
+		// change arrives. Tracked by reference (not DataItems[0]) so the calculation
+		// survives sorting, which reorders the grid and would otherwise make the
+		// row at index 0 grow its Duration on every refresh.
+		DataItem _lastItem;
+
 		public void UpdateInfo()
 		{
 			// Active window -  Window that appears in the foreground with a highlighted title bar.
@@ -251,9 +279,7 @@ namespace JocysCom.FocusLogger.Controls
 					UpdateFromProcess(activeItem);
 					ControlsHelper.BeginInvoke(() =>
 					{
-						if (DataItems.Count > 0)
-							DataItems[0].Duration = (long)(activeItem.Date - DataItems[0].Date).TotalMilliseconds;
-						DataItems.Insert(0, activeItem);
+						_lastItem = RecordFocusChange(DataItems, _lastItem, activeItem);
 					});
 				}
 				// Get foreground window.
@@ -266,9 +292,7 @@ namespace JocysCom.FocusLogger.Controls
 					UpdateFromProcess(foregroundItem);
 					ControlsHelper.BeginInvoke(() =>
 					{
-						if (DataItems.Count > 0)
-							DataItems[0].Duration = (long)(foregroundItem.Date - DataItems[0].Date).TotalMilliseconds;
-						DataItems.Insert(0, foregroundItem);
+						_lastItem = RecordFocusChange(DataItems, _lastItem, foregroundItem);
 					});
 				}
 			}
