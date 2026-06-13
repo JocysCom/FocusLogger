@@ -1,3 +1,4 @@
+#nullable disable
 using System.Windows;
 
 namespace JocysCom.ClassLibrary.Controls.Themes
