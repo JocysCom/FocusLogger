@@ -286,7 +286,8 @@
 					x:FieldModifier="public"
 					EditingElementStyle="{StaticResource TextBoxCell}"
 					ElementStyle="{StaticResource TextBlockCell}"
-					Header="Path">
+					Header="Path"
+					SortMemberPath="ProcessPath">
 					<DataGridTextColumn.Binding>
 						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
 							<Binding RelativeSource="{RelativeSource Self}" />

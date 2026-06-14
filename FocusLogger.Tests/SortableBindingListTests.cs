@@ -13,8 +13,14 @@ namespace JocysCom.FocusLogger.Tests
 		private static PropertyDescriptor DateDescriptor()
 			=> TypeDescriptor.GetProperties(typeof(DataItem))[nameof(DataItem.Date)];
 
+		private static PropertyDescriptor ProcessPathDescriptor()
+			=> TypeDescriptor.GetProperties(typeof(DataItem))[nameof(DataItem.ProcessPath)];
+
 		private static DataItem ItemAt(DateTime date)
 			=> new DataItem { Date = date };
+
+		private static DataItem ItemWithPath(string path)
+			=> new DataItem { ProcessPath = path };
 
 		[TestMethod]
 		public void ApplySort_ByDateAscending_OrdersByActualDateTime()
@@ -58,6 +64,49 @@ namespace JocysCom.FocusLogger.Tests
 					new DateTime(2026, 4, 4, 10, 30, 0, 0),
 				},
 				list.Select(x => x.Date).ToArray());
+		}
+
+		[TestMethod]
+		public void ApplySort_ByProcessPathAscending_OrdersLexicographically()
+		{
+			// Mirrors the Date-sort tests: confirms that once the Path column wires
+			// SortMemberPath="ProcessPath" through to SortableBindingList, string
+			// values sort alphabetically via PropertyComparer<DataItem>.
+			var list = new SortableBindingList<DataItem>
+			{
+				ItemWithPath(@"C:\Windows\explorer.exe"),
+				ItemWithPath(@"C:\Program Files\App\app.exe"),
+				ItemWithPath(@"D:\Tools\utility.exe"),
+			};
+			((IBindingList)list).ApplySort(ProcessPathDescriptor(), ListSortDirection.Ascending);
+			CollectionAssert.AreEqual(
+				new[]
+				{
+					@"C:\Program Files\App\app.exe",
+					@"C:\Windows\explorer.exe",
+					@"D:\Tools\utility.exe",
+				},
+				list.Select(x => x.ProcessPath).ToArray());
+		}
+
+		[TestMethod]
+		public void ApplySort_ByProcessPathDescending_OrdersLexicographicallyReversed()
+		{
+			var list = new SortableBindingList<DataItem>
+			{
+				ItemWithPath(@"C:\Program Files\App\app.exe"),
+				ItemWithPath(@"D:\Tools\utility.exe"),
+				ItemWithPath(@"C:\Windows\explorer.exe"),
+			};
+			((IBindingList)list).ApplySort(ProcessPathDescriptor(), ListSortDirection.Descending);
+			CollectionAssert.AreEqual(
+				new[]
+				{
+					@"D:\Tools\utility.exe",
+					@"C:\Windows\explorer.exe",
+					@"C:\Program Files\App\app.exe",
+				},
+				list.Select(x => x.ProcessPath).ToArray());
 		}
 
 		[TestMethod]
