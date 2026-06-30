@@ -1,3 +1,5 @@
+#nullable disable
+
 using System;
 using System.Linq;
 #if NETFRAMEWORK // .NET Framework...

@@ -1,3 +1,5 @@
+#nullable disable
+
 using JocysCom.ClassLibrary.ComponentModel;
 using System.ComponentModel;
 

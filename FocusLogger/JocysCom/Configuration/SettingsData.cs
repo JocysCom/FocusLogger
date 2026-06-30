@@ -1,4 +1,6 @@
-﻿using JocysCom.ClassLibrary.Collections;
+﻿#nullable disable
+
+using JocysCom.ClassLibrary.Collections;
 using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Runtime;
 using System;
